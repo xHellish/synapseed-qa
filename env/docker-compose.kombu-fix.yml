@@ -1,0 +1,29 @@
+# =============================================
+# Arnes de pruebas: version de kombu
+# ---------------------------------------------
+# SynapSeed (ec14b12) fija celery==5.4.0 y redis==5.2.1, pero no fija kombu.
+# pip instala kombu 5.7.0, que exige redis>=6.1.0:
+#   - el worker se cae al arrancar (VersionMismatch)
+#   - el backend responde 500 al encolar una recomendacion
+# Este override no modifica el submodulo: fija kombu 5.4.x al iniciar cada contenedor
+# y luego ejecuta el mismo comando que define SynapSeed.
+# Uso, desde la raiz de synapseed-qa:
+#   docker compose -f synapseed/docker-compose.yml -f env/docker-compose.kombu-fix.yml up -d
+services:
+  backend:
+    command:
+      - sh
+      - -c
+      - >-
+        pip install --no-cache-dir --quiet "kombu>=5.4,<5.5" &&
+        alembic upgrade head &&
+        exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/app
+
+  worker:
+    command:
+      - sh
+      - -c
+      - >-
+        pip install --no-cache-dir --quiet "kombu>=5.4,<5.5" &&
+        exec celery -A app.workers.celery_app worker --loglevel=info
+        --concurrency=1 --prefetch-multiplier=1 --time-limit=600 --max-tasks-per-child=50

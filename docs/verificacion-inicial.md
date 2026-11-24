@@ -1,0 +1,68 @@
+# Verificación inicial de SynapSeed
+
+Primera corrida de las herramientas que trae el propio sistema, hecha el 2026-11-24 sobre el commit `ec14b12`, sin ambiente levantado (sin base de datos, Redis ni servicios externos). Estos hallazgos todavía no son reportes formales de defecto: falta pasarlos al formato de defectos con severidad, prioridad y caso de prueba asociado.
+
+## Resultados
+
+| Verificación | Comando | Resultado |
+|--------------|---------|-----------|
+| Pruebas backend tal como están | `python -m pytest` | No ejecuta: 2 archivos fallan en la recolección |
+| Pruebas backend ignorando deprecaciones | `python -m pytest -o "filterwarnings=ignore::DeprecationWarning"` | 18 de 22 pasan |
+| Cobertura backend | `--cov=app` | 53%, bajo el umbral de 80% que fija el propio `pyproject.toml` |
+| Lint backend | `ruff check app tests` | 169 hallazgos, 146 corregibles automáticamente |
+| Formato backend | `ruff format --check app tests` | 36 de 80 archivos no cumplen el formato |
+| Pruebas frontend | `npm test` | 3 de 4 pasan; solo existe 1 archivo de pruebas |
+| Lint frontend | `npm run lint` | Sin hallazgos |
+| Tipos frontend | `npm run typecheck` | Sin errores |
+| Build frontend | `npm run build` | Compila; bundle principal de 471.61 kB (150.57 kB gzip) |
+| Pruebas E2E | `npm run test:e2e` | El script existe, pero no hay pruebas ni configuración de Playwright |
+
+En el backend, las rutas de la API (`app/api/v1/`), el worker de Celery (`app/workers/`) y el seed (`app/db/seed.py`) tienen 0% de cobertura.
+
+## Hallazgos candidatos a defecto
+
+1. **La suite del backend no se ejecuta sin modificar la configuración.** `anyio` no tiene versión fijada; la versión que se instala hoy (4.16.0) emite un `DeprecationWarning` y `pyproject.toml` convierte toda advertencia en error (`filterwarnings = ["error", ...]`). Resultado: `tests/api/v1/test_recommendations.py` y `tests/test_api_endpoints.py` fallan en la recolección.
+2. **Prueba del frontend en rojo.** `src/frontend/src/features/wizard/recommendationMapper.test.ts:73` espera `compatibility: "Excelente"` y el código devuelve `"Sí"`. Hay que determinar si el defecto está en el código o en la prueba.
+3. **Código de respuesta no esperado en recomendaciones.** `src/backend/tests/api/v1/test_recommendations.py:117` acepta 200, 401, 404, 422 o 500, y el sistema responde 503 sin base de datos.
+4. **Health check degradado.** `GET /api/v1/health` responde `status: "degraded"` cuando la base de datos no está disponible, y `tests/test_api_endpoints.py:13` espera `"ok"`. Hay que revisar si el comportamiento esperado está definido en los requisitos.
+5. **Build del frontend no reproducible.** El frontend no versiona `package-lock.json`, así que cada `npm install` puede resolver versiones distintas.
+
+## Hallazgos al levantar el sistema con Docker
+
+Encontrados el 2026-11-24 al ejecutar `docker compose up` con la configuración original de SynapSeed (Supabase, OpenRouter y Gemini).
+
+6. **El worker de Celery no arranca y el backend no puede encolar recomendaciones.** `kombu` no tiene versión fijada; pip instala kombu 5.7.0, que exige `redis>=6.1.0`, mientras `pyproject.toml` fija `redis==5.2.1`. El worker se reinicia en bucle con `kombu.exceptions.VersionMismatch`, y `POST /api/v1/recommendations/request` responde 500. Contorno para pruebas: `env/docker-compose.kombu-fix.yml`.
+7. **Modelo de embeddings retirado.** `app/config.py` usa `models/text-embedding-004`, que ya no aparece en la lista de modelos de la API de Gemini (hoy ofrece `gemini-embedding-001`, `gemini-embedding-2` y `gemini-embedding-2-preview`). El seed lo detecta y carga los productos sin embeddings.
+8. **Comentario inconsistente con la configuración.** El comentario de `get_embedding()` en `app/db/seed.py` dice "gemini-embedding-001, 768 dims", pero el modelo configurado es `text-embedding-004`.
+9. **Recorte silencioso de embeddings.** `get_embedding()` recorta o rellena con ceros cualquier embedding que no mida 768, sin registrar ninguna advertencia.
+10. **Alternativa local documentada pero no soportada.** `.env.example` ofrece una base de datos Postgres local en `localhost:5432`, pero `docker-compose.yml` no define ningún servicio de Postgres.
+
+## Hallazgos de la prueba de humo de la API
+
+Prueba de humo del 2026-11-24 contra `http://localhost:8000/api/v1`, con un usuario sintético. Pasan: health, los 8 catálogos, búsqueda de productos, registro, inicio de sesión (válido e inválido), `GET /users/me` con y sin token, CRUD de la zona propia, rechazo con 404 de las zonas de otros usuarios (ids 1 a 9), validación 422 de una solicitud de recomendación inválida, frontend en `:5173` y CORS que rechaza orígenes ajenos.
+
+11. **Errores intermitentes de base de datos con el pooler de Supabase.** Con el Transaction pooler (puerto 6543), backend y worker fallan con `asyncpg.exceptions.DuplicatePreparedStatementError: prepared statement "__asyncpg_stmt_N__" already exists`. `app/db/session.py` desactiva la caché de sentencias (`statement_cache_size=0`), pero no define nombres únicos para las sentencias preparadas, así que PgBouncer las reutiliza entre conexiones. El pipeline de recomendación falla en su primera consulta.
+12. **Una recomendación que falla queda en PENDING para siempre.** Cuando la tarea del worker lanza una excepción, la recomendación no pasa a `FAILED` ni guarda `error_message`. La recomendación 75 quedó en `PENDING` tras el error del hallazgo 11; el frontend esperaría indefinidamente.
+13. **Registro huérfano si falla el encolado.** `POST /recommendations/request` crea la recomendación en la base antes de encolar la tarea; si el encolado falla (hallazgo 6) responde 500, pero la fila queda en `PENDING` (recomendación 74).
+14. **La respuesta 500 expone el traceback completo.** El cuerpo de la respuesta de error de `POST /recommendations/request` incluye el traceback de Python con rutas internas del servidor. Probablemente por `DEBUG=true`, el valor por defecto del `.env.example`.
+15. **Zonas sin validación de entrada.** `POST` y `PUT /api/v1/zones` reciben `payload: dict` en lugar de un schema de Pydantic. Se aceptó con 201 una zona con nombre `<script>alert(1)</script>` y campos no definidos (`extra_field`, `user_id`). Falta verificar si `user_id` del cuerpo se ignora y si el nombre se escapa en el frontend.
+16. **Humedad inválida reemplazada en silencio.** `RecommendationRequest.coerce_humidity` convierte cualquier texto no reconocido en `60.0` en vez de rechazarlo con 422.
+17. **Esquemas de usuario duplicados con reglas distintas.** `app/schemas/auth.py` (`RegisterRequest`: cédula mínimo 5, contraseña mínimo 6) y `app/schemas/user.py` (`UserRegister`: cédula mínimo 9, contraseña mínimo 8) definen el registro con reglas diferentes; el router usa el segundo.
+18. **Columna documentada que no existe.** La Spec validada y el DBML incluyen `recommendations.processing_time_ms`, pero la tabla no tiene esa columna.
+19. **Recomendaciones antiguas atascadas.** La base contiene 7 recomendaciones en `PENDING` y 2 en `PROCESSING` creadas en junio de 2026, nunca resueltas: no hay mecanismo de expiración ni limpieza.
+20. **Health check incompleto.** `GET /api/v1/health` responde `status: "ok"` con `redis: "pending"`, es decir, sin haber verificado Redis.
+
+## Flujo de recomendación completo
+
+Con `DATABASE_URL` en el Session pooler (puerto 5432) y `env/docker-compose.kombu-fix.yml`, la recomendación 76 (tomate en floración, áfidos en hojas jóvenes, suelo franco, humedad media, 24 °C, presupuesto 15000 por litro) terminó en `COMPLETED` con 3 productos, proveedores (`GET /recommendations/{id}/providers` devuelve 3) e historial.
+
+21. **Tiempo de respuesta fuera de lo documentado.** La recomendación tardó 1 min 43 s (103 s de creación a completado). El README del MVP declara entre 10 y 50 s.
+22. **Pertinencia dudosa de los productos recomendados.** Para áfidos en tomate, el sistema devolvió Crypmont, Californicus System y Neocal. Por su nombre e ingrediente activo, parecen agentes de control biológico orientados a cochinillas (Crypmont) y a ácaros (Neoseiulus californicus), no a áfidos. Requiere validación de una persona con criterio agronómico antes de reportarlo como defecto.
+23. **Catálogo incompleto en los productos recomendados.** Los 3 productos tienen `banda_toxicologica` y `cultivo_objetivo` vacíos, y Crypmont no tiene `ingrediente_activo`. La tabla comparativa del resultado no puede mostrar toxicidad, un dato de seguridad para quien aplica el producto.
+24. **Nombres de columnas distintos a los documentados.** La Spec validada describe `Product` con columnas en inglés (`name`, `active_ingredient`, `toxicity_band`); el modelo real usa nombres en español (`nombre_comercial`, `ingrediente_activo`, `banda_toxicologica`).
+
+## Datos existentes en la base
+
+La base de Supabase no está vacía: trae 7 usuarios, 9 zonas, 55 recomendaciones y 3672 registros de auditoría de junio de 2026, además del catálogo cargado por el seed (13401 productos, 565 distribuidores, 8528 LMR, 5 regulaciones, ninguno con embeddings). Las reglas del proyecto exigen datos sintéticos; esos usuarios pueden contener datos personales reales y no deben usarse en las pruebas ni copiarse a la evidencia.
+
+Las pruebas `test_login_endpoint_returns_token` y `test_catalogs_endpoint_returns_seed_data` fallan por falta de base de datos (conexión rechazada), no por un defecto del código.

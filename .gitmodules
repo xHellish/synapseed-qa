@@ -1,0 +1,4 @@
+[submodule "synapseed"]
+	path = synapseed
+	url = https://github.com/xHellish/synapseed.git
+	ignore = untracked

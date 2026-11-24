@@ -1,0 +1,24 @@
+# =============================================
+# Dependencias y entornos
+# ---------------------------------------------
+node_modules/
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# =============================================
+# Variables de entorno (nunca se versionan)
+# ---------------------------------------------
+.env
+.env.*
+
+# =============================================
+# Salidas temporales de herramientas
+# ---------------------------------------------
+# La evidencia que se entrega se copia a reports/
+.coverage
+coverage/
+htmlcov/
+test-results/
+playwright-report/

@@ -1,0 +1,76 @@
+# SynapSeed QA
+
+Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Calidad del Software (TEC), basada en el modelo ISO/IEC 25010:2023. Este repo guarda todo el trabajo del equipo auditor: ambiente de pruebas, pruebas de todos los niveles y tipos, reportes de herramientas y documentación de la auditoría. El sistema auditado vive en el submódulo `synapseed/`, fijado en el commit `ec14b12`.
+
+## ¿Cómo lo corro en mi máquina?
+
+1. Clonar el repo junto con el submódulo:
+
+   ```bash
+   git clone --recurse-submodules https://github.com/xHellish/synapseed-qa.git
+   cd synapseed-qa
+   ```
+
+   Si ya estaba clonado sin el submódulo:
+
+   ```bash
+   git submodule update --init
+   ```
+
+2. Pruebas del backend de SynapSeed (requiere [uv](https://docs.astral.sh/uv/)):
+
+   ```bash
+   cd synapseed/src/backend
+   uv venv --python 3.12
+   uv pip install -e ".[dev]"
+   ```
+
+   Ejecutar desde `synapseed/src/backend` (en Linux o macOS cambiar `.venv\Scripts\python` por `.venv/bin/python`):
+
+   ```bash
+   .venv\Scripts\python -m pytest --cov=app --cov-report=term -o "filterwarnings=ignore::DeprecationWarning"
+   ```
+
+   La opción `-o "filterwarnings=..."` es necesaria porque, sin ella, la suite no llega a ejecutarse (ver `docs/verificacion-inicial.md`). Sin base de datos ni Redis fallan 4 de las 22 pruebas.
+
+3. Pruebas, lint y tipos del frontend de SynapSeed (requiere Node 22):
+
+   ```bash
+   cd synapseed/src/frontend
+   npm install
+   npm test
+   npm run lint
+   npm run typecheck
+   ```
+
+4. Levantar SynapSeed con su configuración original (Supabase, OpenRouter y Gemini). Requiere Docker, ya sea Docker Desktop o Docker Engine dentro de WSL, y el archivo `synapseed/.env` descrito en la sección siguiente. Desde la raíz de este repo:
+
+   ```bash
+   docker compose -f synapseed/docker-compose.yml -f env/docker-compose.kombu-fix.yml up -d --build
+   docker compose -f synapseed/docker-compose.yml exec backend python -m app.db.seed
+   ```
+
+   `env/docker-compose.kombu-fix.yml` es necesario: sin él, el worker no arranca (ver Decision Log). La aplicación queda en http://localhost:5173 y la documentación de la API en http://localhost:8000/docs.
+
+   Esta configuración solo sirve para exploración manual y pruebas funcionales: usa servicios de terceros, así que no se usa para pruebas de seguridad ni de carga. El ambiente QA local (Postgres propio y LLM simulado) todavía no existe; se agregará en `env/`.
+
+## Variables de entorno
+
+Las variables van en `synapseed/.env`, que se crea copiando `synapseed/.env.example` y nunca se versiona. Estas son las que hay que llenar; el resto puede quedar con el valor de la plantilla.
+
+| Variable | Descripción | Ejemplo |
+|----------|-------------|---------|
+| `DATABASE_URL` | Conexión async a Supabase por el **Session pooler** (puerto 5432); con el Transaction pooler el pipeline falla | `postgresql+asyncpg://postgres.<ref>:<contraseña>@aws-1-us-east-1.pooler.supabase.com:5432/postgres` |
+| `DATABASE_URL_SYNC` | Conexión sync para Alembic, por el Transaction pooler | `postgresql+psycopg2://postgres.<ref>:<contraseña>@aws-1-us-east-1.pooler.supabase.com:6543/postgres` |
+| `SUPABASE_URL` | URL del proyecto de Supabase | `https://<ref>.supabase.co` |
+| `SUPABASE_ANON_KEY` | Publishable key del proyecto (Settings, API Keys) | `sb_publishable_...` |
+| `JWT_SECRET` | Cadena aleatoria para firmar tokens locales | Salida de `python3 -c "import secrets; print(secrets.token_urlsafe(64))"` |
+| `OPENROUTER_API_KEY` | Llave del LLM de chat, con límite de crédito | `sk-or-...` |
+| `GEMINI_API_KEY` | Llave de Google AI Studio para embeddings | `AQ....` |
+
+## Stack
+
+- **Sistema auditado**: SynapSeed - FastAPI (Python 3.12), React 19 + Vite, Celery + Redis, Postgres + pgvector, pipeline de agentes con LangGraph
+- **Pruebas del backend**: pytest, pytest-cov, Ruff
+- **Pruebas del frontend**: Vitest, ESLint, TypeScript (`tsc`)
+- **Control de versiones**: Git con SynapSeed como submódulo
