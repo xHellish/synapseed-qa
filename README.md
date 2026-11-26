@@ -54,6 +54,49 @@ Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Cal
 
    Esta configuración solo sirve para exploración manual y pruebas funcionales: usa servicios de terceros, así que no se usa para pruebas de seguridad ni de carga. El ambiente QA local (Postgres propio y LLM simulado) todavía no existe; se agregará en `env/`.
 
+5. Pruebas del equipo QA. Las de Python usan el entorno del submódulo creado en el paso 2 y se corren desde la raíz de este repo:
+
+   ```bash
+   synapseed\src\backend\.venv\Scripts\python -m pytest
+   ```
+
+   Variantes útiles:
+
+   | Qué correr | Comando (agregar al anterior) |
+   |------------|-------------------------------|
+   | Solo un tipo | `-m unit`, `-m integration` o `-m security` |
+   | Solo un área | `tests/zonas-catalogos` |
+   | Con cobertura | `--cov=synapseed/src/backend/app --cov-report=html:reports/coverage` |
+
+   Las E2E (Playwright) se corren desde `tests/`; la primera vez hay que instalar el navegador:
+
+   ```bash
+   cd tests
+   npm install
+   npx playwright install chromium
+   npx playwright test
+   ```
+
+   El reporte HTML queda en `reports/e2e/html`. Para correr solo un área: `npx playwright test recomendacion`. Las URLs del ambiente se cambian con `QA_API_URL` y `QA_WEB_URL`.
+
+## Organización del trabajo
+
+Las pruebas están separadas por área funcional; cada área tiene un dueño, que solo hace commit dentro de su carpeta.
+
+| Área | Responsable | Requerimientos | Subcarpetas |
+|------|-------------|----------------|-------------|
+| `tests/auth-seguridad/` | Persona A | RF-01, RF-02, RNF-01 | `unit`, `integration`, `e2e`, `api`, `security`, `performance` |
+| `tests/zonas-catalogos/` | Persona B | RF-03, RF-04, RNF-02 | `unit`, `integration`, `e2e`, `api` |
+| `tests/recomendacion/` | Persona C | RF-05, RF-06, RNF-03 | `unit`, `integration`, `e2e`, `api` |
+
+Convenciones:
+
+- Los archivos compartidos (`tests/conftest.py`, `pytest.ini`, `tests/playwright.config.js`) se cambian solo avisando al equipo.
+- El nombre de cada prueba automatizada empieza con el ID de su caso, por ejemplo `test_cp_rf03_02_zona_sin_nombre`, para enlazarla en la matriz de trazabilidad.
+- Las colecciones de Postman van una por área en su carpeta `api/`.
+- Los documentos están en `docs/`; cada persona escribe sus casos en `docs/casos-prueba/casos-<A|B|C>.md`. En `defectos.md`, `matriz-trazabilidad.md` e `informe-final.md` cada quien edita solo sus filas o su sección.
+- La evidencia de cada corrida va a `reports/`.
+
 ## Variables de entorno
 
 Las variables van en `synapseed/.env`, que se crea copiando `synapseed/.env.example` y nunca se versiona. Estas son las que hay que llenar; el resto puede quedar con el valor de la plantilla.
@@ -73,4 +116,7 @@ Las variables van en `synapseed/.env`, que se crea copiando `synapseed/.env.exam
 - **Sistema auditado**: SynapSeed - FastAPI (Python 3.12), React 19 + Vite, Celery + Redis, Postgres + pgvector, pipeline de agentes con LangGraph
 - **Pruebas del backend**: pytest, pytest-cov, Ruff
 - **Pruebas del frontend**: Vitest, ESLint, TypeScript (`tsc`)
+- **Pruebas E2E**: Playwright (JavaScript)
+- **Pruebas de API**: Postman CLI
+- **Carga, seguridad y análisis estático**: k6, OWASP ZAP y SonarQube, corridos como imágenes de Docker
 - **Control de versiones**: Git con SynapSeed como submódulo

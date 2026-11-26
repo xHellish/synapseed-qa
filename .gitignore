@@ -18,7 +18,7 @@ __pycache__/
 # ---------------------------------------------
 # La evidencia que se entrega se copia a reports/
 .coverage
-coverage/
+/coverage/
 htmlcov/
 test-results/
 playwright-report/

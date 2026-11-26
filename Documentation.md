@@ -8,14 +8,19 @@ El repo separa el sistema auditado del trabajo del auditor. SynapSeed entra como
 |---------|-----------------|
 | `synapseed/` | Submódulo con el sistema auditado, fijado en el commit `ec14b12`. No se modifica: los defectos se reportan, no se corrigen |
 | `env/` | Ambiente QA local: configuración para levantar SynapSeed sin servicios de terceros y datos sintéticos |
-| `tests/unit/` | Pruebas unitarias sobre el código del submódulo, con dobles de prueba |
-| `tests/integration/` | Colaboración entre componentes: API con base de datos, servicio con cola |
-| `tests/e2e/` | Pruebas de sistema de punta a punta por la interfaz |
-| `tests/api/` | Colecciones de pruebas de API |
-| `tests/performance/` | Escenarios de rendimiento y carga |
-| `tests/security/` | Verificaciones de seguridad automatizadas y guías de pruebas manuales |
-| `docs/` | Plan de calidad, GQM y fichas de métricas, casos de prueba, matriz de trazabilidad, defectos e informe final |
-| `reports/` | Evidencia de cada corrida: cobertura, análisis estático, carga, seguridad |
+| `tests/` (raíz) | Configuración compartida: `conftest.py` (path al backend, marcas por tipo, fixtures comunes), `playwright.config.js` y `package.json` de Playwright |
+| `tests/auth-seguridad/` | Área de la Persona A: registro, inicio de sesión, verificaciones de seguridad y escenarios de carga |
+| `tests/zonas-catalogos/` | Área de la Persona B: zonas de cultivo y catálogos del asistente |
+| `tests/recomendacion/` | Área de la Persona C: pipeline de recomendación, proveedores e historial |
+| `tests/<área>/<tipo>/` | Dentro de cada área: `unit` (dobles de prueba), `integration` (efecto de lado en la base o la cola), `e2e` (Playwright), `api` (colección de Postman); en auth-seguridad además `security` y `performance` (k6) |
+| `docs/` | Plan de calidad, GQM y fichas de métricas, estáticas, casos de prueba por persona, UAT, usabilidad, matriz de trazabilidad, defectos e informe final |
+| `reports/` | Evidencia de cada corrida: `coverage`, `ruff`, `sonar`, `k6`, `zap`, `e2e` |
+
+### Cómo se ejecutan las pruebas
+
+- **pytest** corre desde la raíz con el Python del submódulo. `pytest.ini` usa `--import-mode=importlib`, que permite archivos con el mismo nombre en áreas distintas. `tests/conftest.py` agrega `synapseed/src/backend` al path para importar `app.*` y marca cada prueba según la subcarpeta de tipo, así `-m unit` junta las unitarias de las tres áreas.
+- **Playwright** usa una sola configuración en `tests/` que busca `**/e2e/**/*.spec.js`. Guarda traza y captura de cada fallo y un reporte HTML por corrida en `reports/e2e/`.
+- **k6, ZAP y SonarQube** se corren con sus imágenes oficiales de Docker, sin instalar nada en las máquinas. `sonar-project.properties` limita el análisis al código de SynapSeed.
 
 ```mermaid
 C4Context
@@ -38,6 +43,18 @@ C4Context
 ```
 
 ## Decision Log
+
+### [2026-11-26] Herramientas externas por Docker y variables documentadas en el README
+
+**Contexto:** El enunciado sugiere k6, OWASP ZAP y SonarQube, y pide un archivo de ejemplo de variables de entorno sin valores reales. Instalar esas herramientas en tres máquinas distintas consume tiempo y produce diferencias entre integrantes; además, la convención del equipo es no crear archivos `.env.example`.
+**Decisión:** k6, ZAP y SonarQube se ejecutan con sus imágenes oficiales de Docker, que ya está instalado para levantar SynapSeed. Las pruebas de API usan Postman. Las variables de entorno se documentan en la tabla del README, sin crear un archivo de ejemplo.
+**Consecuencias:** Todas las personas corren las mismas versiones con el mismo comando. El informe debe explicar que la tabla del README cumple la función del archivo de ejemplo.
+
+### [2026-11-26] Pruebas separadas por área funcional con un dueño por área
+
+**Contexto:** Tres personas escriben pruebas al mismo tiempo durante cuatro días. Con carpetas por tipo (`tests/unit`, `tests/e2e`) todas editarían las mismas carpetas y archivos, con más conflictos de merge, y el aporte individual sería más difícil de ver.
+**Decisión:** `tests/` se divide en `auth-seguridad`, `zonas-catalogos` y `recomendacion`, cada una con subcarpetas por tipo. La configuración compartida queda en la raíz de `tests/`. Las marcas de pytest se asignan automáticamente por subcarpeta, y las colecciones de Postman son una por área.
+**Consecuencias:** Cada persona trabaja y hace commit en su carpeta, y el historial muestra el aporte de cada quien. Se puede correr todo, un área o un tipo. Los archivos compartidos y los documentos consolidados (defectos, matriz, informe) siguen requiriendo coordinación.
 
 ### [2026-11-24] DATABASE_URL apunta al Session pooler de Supabase
 
