@@ -112,6 +112,7 @@ El mínimo exigido es 3 (uno por integrante). RNF-04 y RNF-05 se agregan para qu
 5. Las entradas se validan en el backend (Pydantic) y en el frontend (Zod); el texto ingresado no se ejecuta como código en la interfaz.
 6. Las llaves y contraseñas viven solo en variables de entorno.
 7. Las respuestas de error no exponen detalles internos (rutas, trazas, consultas). Criterio derivado de la confidencialidad; la Spec no lo menciona.
+8. El inicio de sesión limita los intentos fallidos seguidos, con espera, bloqueo temporal o respuesta 429. Criterio derivado de OWASP ASVS 4.0, requisito 2.2.1; la Spec no lo menciona.
 
 ### RNF-02 Mantenibilidad del código
 

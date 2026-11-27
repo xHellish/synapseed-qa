@@ -192,3 +192,27 @@ def user_token(api, registered_user):
             + str(response.body)
         )
     return response.body["access_token"]
+
+
+# Fabrica de usuarios con sesion: registra, inicia sesion y devuelve datos con "token"
+@pytest.fixture
+def make_session(api):
+    # Registra e inicia sesion con un usuario sintetico nuevo
+    def create_session():
+        data = new_user_data()
+        registration = api.call("POST", "/auth/register", data)
+        if registration.status != 201:
+            raise RuntimeError(
+                "Could not register test user: " + str(registration.status)
+            )
+        credentials = {
+            "identification": data["identification"],
+            "password": data["password"],
+        }
+        login = api.call("POST", "/auth/login", credentials)
+        if login.status != 200:
+            raise RuntimeError("Could not log in test user: " + str(login.status))
+        data["token"] = login.body["access_token"]
+        return data
+
+    return create_session

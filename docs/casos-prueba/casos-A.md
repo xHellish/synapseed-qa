@@ -20,8 +20,14 @@ Los resultados esperados salen de los criterios de aceptación de `docs/requisit
 | CP-RF02-03 | Mismo rechazo para contraseña y cédula | RF-02 (3) | Partición, dos clases inválidas comparadas | Integración | Pasa |
 | CP-RF02-04 | Login con correo en vez de cédula | RF-02 (4) | Partición de equivalencia, clase inválida | Unitaria e integración | Pasa |
 | CP-RF02-05 | Perfil propio con y sin token | RF-02 (5), RNF-01 (1) | Partición: con token y sin token | Integración | Pasa |
+| CP-RNF01-01 (SEC-01) | Reset de contraseña sin verificación | RNF-01 (2) | Prueba de ataque: toma de cuenta | Seguridad | Falla (hallazgo 27) |
+| CP-RNF01-02 (SEC-02) | Tokens manipulados | RNF-01 (1, 7) | Partición: 5 clases de token inválido | Seguridad | Pasa con defecto (hallazgo 29) |
+| CP-RNF01-03 (SEC-03) | Acceso a datos de otra persona | RNF-01 (1, 2) | Prueba de ataque: IDOR con dos cuentas | Seguridad | Pasa con defecto (hallazgo 28) |
+| CP-RNF01-04 (SEC-04) | Validación de entrada en zonas | RNF-01 (5) | Partición: campo extra, tipo incorrecto, HTML | Seguridad | Falla (hallazgo 15) |
+| CP-RNF01-05 (SEC-05) | Detalles internos en errores | RNF-01 (7) | Adivinación de errores: provocar un 500 | Seguridad | Falla (hallazgo 14) |
+| CP-RNF01-06 (SEC-06) | Fuerza bruta en el login | RNF-01 (8) | Prueba de ataque: 30 intentos seguidos | Seguridad | Falla (hallazgo 30) |
 
-Ejecución: 2026-11-26 contra el ambiente QA local (`env/docker-compose.qa.yml`), con `synapseed\src\backend\.venv\Scripts\python -m pytest tests/auth-seguridad`. Resultado: 31 pruebas pasan y 4 fallan como se esperaba (`xfail`, hallazgo 17).
+Ejecución: 2026-11-26 contra el ambiente QA local (`env/docker-compose.qa.yml`), con `synapseed\src\backend\.venv\Scripts\python -m pytest tests/auth-seguridad`. Resultado: 41 pruebas pasan y 16 fallan como se esperaba (`xfail`): 4 del hallazgo 17 y 12 de las verificaciones de seguridad. El detalle de los ataques está en `tests/auth-seguridad/security/verificaciones.md`.
 
 Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(strict=True, reason="Hallazgo N ...")`: la suite queda en verde, el defecto queda visible en el reporte como `XFAIL` y, si alguien lo corrige, la prueba pasa a `XPASS` y la suite falla para que se quite la marca.
 
@@ -263,4 +269,124 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 200 con el perfil propio; 401 sin token |
 | Estado | Pasa |
 | Evidencia | Corrida de pytest del 2026-11-26 |
+| Responsable | Persona A |
+
+## CP-RNF01-01
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RNF01-01 |
+| Nombre | Reset de contraseña sin verificación (SEC-01) |
+| Objetivo | Verificar que nadie puede cambiar la contraseña de una cuenta ajena sin probar que la controla |
+| Requerimiento asociado | RNF-01, criterio 2 |
+| Tipo y nivel de prueba | Seguridad, sistema (API del ambiente QA local) |
+| Prioridad | Alta |
+| Característica 25010 que evidencia | Seguridad (autenticidad, integridad, resistencia) |
+| Precondiciones | Ambiente QA local en modo de autenticación local (sin Supabase); víctima registrada |
+| Datos de prueba | Cédula y correo de la víctima; contraseña nueva elegida por el atacante; para el caso negativo, correo que no coincide y cédula inexistente |
+| Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_01_reset_sin_verificacion_no_toma_la_cuenta` (xfail), `test_cp_rnf01_01_reset_con_datos_erroneos_no_revela_la_cuenta` (`security/test_security.py`) |
+| Resultado esperado | El reset sin prueba de control de la cuenta se rechaza y la contraseña nueva no sirve para iniciar sesión. Con datos que no coinciden, el mismo error genérico para cédula inexistente y correo incorrecto |
+| Resultado obtenido | 204: la contraseña cambia y el atacante inicia sesión; la original deja de funcionar. Con datos erróneos, 400 con el mismo mensaje en ambos casos |
+| Estado | Falla; confirma el hallazgo 27 |
+| Evidencia | Corrida de pytest del 2026-11-26; detalle en `tests/auth-seguridad/security/verificaciones.md` |
+| Responsable | Persona A |
+
+## CP-RNF01-02
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RNF01-02 |
+| Nombre | Tokens manipulados (SEC-02) |
+| Objetivo | Verificar que un token alterado no da acceso y se rechaza como credencial inválida |
+| Requerimiento asociado | RNF-01, criterios 1 y 7 |
+| Tipo y nivel de prueba | Seguridad, sistema (API del ambiente QA local) |
+| Prioridad | Alta |
+| Característica 25010 que evidencia | Seguridad (autenticidad, confidencialidad) |
+| Precondiciones | Usuario con un token legítimo |
+| Datos de prueba | 5 tokens: `alg: none`, payload con otro `sub` y la firma original, firmado con secreto ajeno, vencido con secreto ajeno, y `abc.def.ghi` |
+| Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_02_token_manipulado_no_da_acceso` (5 valores), `test_cp_rnf01_02_token_manipulado_responde_401` (5 valores, xfail) |
+| Resultado esperado | `GET /users/me` con cada token: 401, sin datos del perfil ni detalles de configuración |
+| Resultado obtenido | Ningún token da acceso, pero los 5 responden 503 "SUPABASE_URL y SUPABASE_ANON_KEY deben estar configurados" |
+| Estado | Pasa en el acceso; falla en la respuesta (hallazgo 29) |
+| Evidencia | Corrida de pytest del 2026-11-26; detalle en `tests/auth-seguridad/security/verificaciones.md` |
+| Responsable | Persona A |
+
+## CP-RNF01-03
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RNF01-03 |
+| Nombre | Acceso a datos de otra persona (SEC-03) |
+| Objetivo | Verificar que una persona no puede leer ni modificar zonas ni recomendaciones de otra |
+| Requerimiento asociado | RNF-01, criterios 1 y 2 |
+| Tipo y nivel de prueba | Seguridad, sistema (API del ambiente QA local) |
+| Prioridad | Alta |
+| Característica 25010 que evidencia | Seguridad (confidencialidad, integridad) |
+| Precondiciones | Dos personas con sesión; la dueña tiene una zona y una recomendación |
+| Datos de prueba | Token de la otra persona; IDs de la zona y la recomendación de la dueña; `ticket_id` de la recomendación |
+| Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_03_zona_ajena_inaccesible`, `test_cp_rnf01_03_recomendacion_ajena_inaccesible`, `test_cp_rnf01_03_stream_de_progreso_exige_token` (xfail) |
+| Resultado esperado | GET, PUT y DELETE de la zona ajena: 404 y la zona intacta. Detalle y proveedores de la recomendación ajena: 404; historial vacío. Stream de progreso sin token: 401 |
+| Resultado obtenido | Zonas y recomendaciones protegidas como se esperaba. El stream responde 200 sin token con el estado de la recomendación |
+| Estado | Pasa en zonas y recomendaciones; falla en el stream (hallazgo 28) |
+| Evidencia | Corrida de pytest del 2026-11-26; detalle en `tests/auth-seguridad/security/verificaciones.md` |
+| Responsable | Persona A |
+
+## CP-RNF01-04
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RNF01-04 |
+| Nombre | Validación de entrada en zonas (SEC-04) |
+| Objetivo | Verificar que la entrada de zonas se valida y que el texto no se ejecuta en la interfaz |
+| Requerimiento asociado | RNF-01, criterio 5; RF-03, criterio 5 |
+| Tipo y nivel de prueba | Seguridad, sistema (API del ambiente QA local) |
+| Prioridad | Media |
+| Característica 25010 que evidencia | Seguridad (integridad); Fiabilidad (tolerancia a fallos) |
+| Precondiciones | Dos personas con sesión |
+| Datos de prueba | Zona con `user_id` de otra persona; zona con `extra_field`; `name: 123`; `latitude: "texto"`; nombre `<script>alert(1)</script>` |
+| Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_04_user_id_del_cuerpo_se_ignora`, `test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza` (3 valores, xfail), `test_cp_rnf01_04_frontend_no_inserta_html_crudo` |
+| Resultado esperado | El `user_id` del cuerpo no asigna la zona a otra persona. Campo desconocido y tipos incorrectos: 422. El frontend no inserta HTML sin escapar |
+| Resultado obtenido | El `user_id` se ignora. Campo desconocido: 201. Nombre numérico y latitud de texto: 500 con traceback. El frontend no usa `dangerouslySetInnerHTML` ni `innerHTML` |
+| Estado | Falla en la validación (hallazgo 15); pasa en asignación y escape |
+| Evidencia | Corrida de pytest del 2026-11-26; detalle en `tests/auth-seguridad/security/verificaciones.md` |
+| Responsable | Persona A |
+
+## CP-RNF01-05
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RNF01-05 |
+| Nombre | Detalles internos en errores (SEC-05) |
+| Objetivo | Verificar que un error del servidor no expone trazas ni rutas internas |
+| Requerimiento asociado | RNF-01, criterio 7 |
+| Tipo y nivel de prueba | Seguridad, sistema (API del ambiente QA local) |
+| Prioridad | Alta |
+| Característica 25010 que evidencia | Seguridad (confidencialidad) |
+| Precondiciones | Ambiente QA con la configuración por defecto de `DEBUG` |
+| Datos de prueba | `POST /zones` con `name: 123`, que provoca una excepción no controlada |
+| Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_05_error_500_sin_traceback` (xfail) |
+| Resultado esperado | 500 con un mensaje genérico, sin `Traceback`, rutas de archivos ni `site-packages` |
+| Resultado obtenido | 500 con el traceback completo de Python y rutas del servidor |
+| Estado | Falla; confirma el hallazgo 14 |
+| Evidencia | Corrida de pytest del 2026-11-26; detalle en `tests/auth-seguridad/security/verificaciones.md` |
+| Responsable | Persona A |
+
+## CP-RNF01-06
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RNF01-06 |
+| Nombre | Fuerza bruta en el login (SEC-06) |
+| Objetivo | Verificar que el login frena los intentos repetidos de adivinar una contraseña |
+| Requerimiento asociado | RNF-01, criterio 8 |
+| Tipo y nivel de prueba | Seguridad, sistema (API del ambiente QA local) |
+| Prioridad | Alta |
+| Característica 25010 que evidencia | Seguridad (autenticidad, resistencia) |
+| Precondiciones | Usuario registrado |
+| Datos de prueba | 30 contraseñas incorrectas seguidas contra la misma cédula |
+| Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_06_login_limita_intentos_fallidos` (xfail) |
+| Resultado esperado | Antes del intento 30 aparece una respuesta 429 o 423, o un bloqueo temporal |
+| Resultado obtenido | Los 30 intentos responden 401, unos 4 por segundo; después la contraseña correcta sigue funcionando |
+| Estado | Falla; nuevo hallazgo 30 |
+| Evidencia | Corrida de pytest del 2026-11-26; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Persona A |

@@ -67,9 +67,23 @@ Encontrados el 2026-11-26 al levantar SynapSeed desde cero con Postgres local (`
 
 25. **El seed depende de archivos que no están en el repo.** `app/db/seed.py` carga productos y LMR desde `output/plaguicidas.csv`, `output/fertilizantes.csv` y `output/lmr.csv`, pero la carpeta `output/` no existe en el repositorio. En una instalación nueva el seed termina "exitosamente" sin cargar ningún producto, y el asistente no puede recomendar nada. Afecta la instalabilidad (Flexibilidad) y la reproducibilidad del sistema.
 26. **Las migraciones y los modelos definen enums incompatibles: una instalación desde cero no funciona.** `alembic/versions/001_initial_schema.py` crea los tipos `product_category`, `product_status`, `toxic_band`, `recommendation_status`, `audit_action` y `regulationtype` con etiquetas en minúscula (`pending`, `plaguicida`). Los modelos usan `SQLEnum` sin `values_callable`, así que escriben el nombre en mayúscula (`PENDING`, `PLAGUICIDA`). En una base creada solo con `alembic upgrade head`, el seed falla con `invalid input value for enum regulationtype: "DECRETO"`, y lo mismo pasaría al crear productos, recomendaciones o registros de auditoría. La base de Supabase tiene las etiquetas en mayúscula, así que no se creó con estas migraciones. Contorno para el ambiente QA: `env/align_enums.py`.
-27. **Restablecimiento de contraseña sin verificación en modo local.** `POST /api/v1/auth/reset-password` es público y, cuando Supabase no está configurado (`_local_auth_enabled()`), cambia la contraseña de cualquier cuenta con solo conocer su cédula y su correo, sin token ni confirmación. No aparece en la Spec. Pendiente de verificar como prueba de seguridad en el ambiente QA local, donde ese modo está activo.
+27. **Restablecimiento de contraseña sin verificación en modo local.** `POST /api/v1/auth/reset-password` es público y, cuando Supabase no está configurado (`_local_auth_enabled()`), cambia la contraseña de cualquier cuenta con solo conocer su cédula y su correo, sin token ni confirmación. No aparece en la Spec. Confirmado como toma de cuenta en la verificación SEC-01 (ver la sección de seguridad).
 
 Matiz sobre el hallazgo 12: en el ambiente local, una falla del LLM (500 inducido) sí deja la recomendación en `FAILED` con `error_message` en unos 17 s. La recomendación se queda en `PENDING` cuando la excepción ocurre antes, en el acceso a la base de datos.
+
+## Hallazgos de las verificaciones de seguridad
+
+Encontrados el 2026-11-26 con las verificaciones SEC-01 a SEC-06 (`tests/auth-seguridad/security/`) contra el ambiente QA local.
+
+28. **El stream de progreso no exige autenticación.** `GET /api/v1/recommendations/stream/{ticket_id}` no usa `get_current_user`: sin token responde 200 con el estado, el paso actual y el mensaje de error de la recomendación. El `ticket_id` es un UUID, así que adivinarlo es difícil, pero es el único endpoint con datos de una persona que no pide token.
+29. **Los tokens inválidos responden 503 con detalles de configuración.** En modo de autenticación local, un token con firma alterada, `alg: none`, secreto ajeno o formato inválido no da acceso, pero `resolve_user_from_token` lo reenvía a la validación de Supabase y la respuesta es 503 "SUPABASE_URL y SUPABASE_ANON_KEY deben estar configurados", en lugar de 401. Revela la configuración interna y confunde al cliente, que interpreta una caída del servicio.
+30. **El login no limita los intentos fallidos.** 30 contraseñas incorrectas seguidas contra la misma cédula responden 401 a unos 4 intentos por segundo, sin espera, bloqueo ni 429, y luego la contraseña correcta sigue funcionando. No hay ningún limitador de peticiones en el backend.
+
+Confirmaciones en el ambiente QA local:
+
+- **Hallazgo 14:** se reproduce sin depender de Supabase. `POST /zones` con `name: 123` responde 500 con el traceback completo. La causa es `debug: bool = True` por defecto en `app/config.py`, y `.env.example` también trae `DEBUG=true`.
+- **Hallazgo 15:** el `user_id` del cuerpo se ignora, porque `clean_payload` copia solo los campos conocidos. Los campos desconocidos se aceptan con 201 sin aviso, y los tipos no se validan: un nombre numérico o una latitud de texto terminan en 500. El nombre `<script>` se guarda tal cual, pero el frontend no inserta HTML sin escapar (no usa `dangerouslySetInnerHTML` ni `innerHTML`).
+- **Hallazgo 27:** confirmado como toma de cuenta. Un tercero sin sesión cambió la contraseña de otra persona con solo su cédula y su correo, y la contraseña original dejó de funcionar. La pantalla de login ofrece este flujo (`LoginPage.tsx`).
 
 ## Datos existentes en la base
 
