@@ -1,0 +1,8 @@
+
+Running 3 tests using 1 worker
+
+  ok 1 [chromium] › auth-seguridad\e2e\auth.spec.js:62:1 › CP-RF01-08 registro por la interfaz y redireccion al login (2.4s)
+  ok 2 [chromium] › auth-seguridad\e2e\auth.spec.js:101:1 › CP-RF02-06 login por la interfaz entra a la zona protegida (2.0s)
+  ok 3 [chromium] › auth-seguridad\e2e\auth.spec.js:124:1 › CP-RF02-07 sin sesion o con contrasena incorrecta no se entra a rutas protegidas (1.7s)
+
+  3 passed (7.5s)

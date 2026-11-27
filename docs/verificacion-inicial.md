@@ -113,6 +113,12 @@ Encontrado el 2026-11-27 al revisar los tiempos de la corrida de Postman y confi
 
 37. **El tiempo de respuesta del login revela qué cédulas están registradas.** El login responde con el mismo 401 y el mismo mensaje para una contraseña incorrecta y para una cédula inexistente, pero `authenticate_user` solo calcula bcrypt cuando la cédula existe. Con 20 intentos alternados, la cédula registrada tardó de 234 a 339 ms y la inexistente de 8 a 28 ms, sin superposición. Evidencia: `reports/manual/def-login-enumeracion-tiempo.txt`.
 
+## Observaciones de las pruebas E2E
+
+Encontrado el 2026-11-27 al automatizar el registro y el login con Playwright.
+
+38. **Los avisos de éxito del registro y del login desaparecen casi de inmediato.** "Cuenta creada" dura 350 ms y "Inicio de sesión exitoso" 300 ms: la página navega y el aviso se desmonta con ella, así que la persona apenas alcanza a verlo y la pantalla de login no confirma que la cuenta se creó. Las pruebas E2E fallaban de forma intermitente al buscar esos avisos y por eso validan la respuesta del backend y la redirección. No se formaliza como defecto porque toca Capacidad de interacción, fuera de las cinco características del plan; se pasa como insumo a la prueba de usabilidad de Persona C.
+
 ## Hallazgos formalizados como defectos
 
 Los hallazgos se formalizan en `docs/defectos.md`, con severidad, prioridad, pasos para reproducir y evidencia. Hallazgos de la Persona A:

@@ -114,7 +114,13 @@ Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Cal
    npx playwright test
    ```
 
-   El reporte HTML queda en `reports/e2e/html`. Para correr solo un área: `npx playwright test recomendacion`. Las URLs del ambiente se cambian con `QA_API_URL` y `QA_WEB_URL`.
+   El reporte HTML queda en `reports/e2e/html`; no se versiona porque pesa varios MB y cada corrida lo reemplaza. Para correr solo un área: `npx playwright test recomendacion`. La evidencia que se entrega es la salida de consola:
+
+   ```bash
+   npx playwright test auth-seguridad --reporter=list,html > ../reports/e2e/auth-seguridad.txt
+   ```
+
+   Las URLs del ambiente se cambian con `QA_API_URL` y `QA_WEB_URL`.
 
    Las pruebas de carga (k6) se corren desde una terminal de WSL en la raíz del repo, con el ambiente QA arriba. El script usa la imagen `grafana/k6` y deja la salida y el resumen en `reports/k6/`:
 

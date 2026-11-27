@@ -15,11 +15,14 @@ Los resultados esperados salen de los criterios de aceptación de `docs/requisit
 | CP-RF01-05 | Contraseña almacenada con bcrypt | RF-01 (5), RNF-01 (3) | Verificación de efecto en base de datos | Integración | Pasa |
 | CP-RF01-06 | Campo obligatorio ausente | RF-01 (6) | Partición, un campo inválido por caso | Unitaria e integración | Pasa |
 | CP-RF01-07 | Reglas de registro consistentes | RF-01 (3, 6) | Valores límite comparados entre esquemas | Unitaria | Falla (DEF-A12, hallazgo 17) |
+| CP-RF01-08 | Registro por la interfaz web | RF-01 (1) | Caso de uso de punta a punta | E2E | Pasa |
 | CP-RF02-01 | Login con credenciales válidas | RF-02 (1) | Partición de equivalencia, clase válida | Integración | Pasa |
 | CP-RF02-02 | Expiración del JWT | RF-02 (2) | Verificación de valor configurado | Integración | Pasa |
 | CP-RF02-03 | Mismo rechazo para contraseña y cédula | RF-02 (3) | Partición, dos clases inválidas comparadas | Integración | Pasa |
 | CP-RF02-04 | Login con correo en vez de cédula | RF-02 (4) | Partición de equivalencia, clase inválida | Unitaria e integración | Pasa |
 | CP-RF02-05 | Perfil propio con y sin token | RF-02 (5), RNF-01 (1) | Partición: con token y sin token | Integración | Pasa |
+| CP-RF02-06 | Login por la interfaz y acceso a una ruta protegida | RF-02 (1, 5) | Caso de uso de punta a punta | E2E | Pasa |
+| CP-RF02-07 | Sin sesión o con contraseña incorrecta no hay acceso | RF-02 (3, 5) | Partición: sin sesión y credencial inválida | E2E | Pasa |
 | CP-RNF01-01 (SEC-01) | Reset de contraseña sin verificación | RNF-01 (2) | Prueba de ataque: toma de cuenta | Seguridad | Falla (DEF-A01, hallazgo 27) |
 | CP-RNF01-02 (SEC-02) | Tokens manipulados | RNF-01 (1, 7) | Partición: 5 clases de token inválido | Seguridad | Pasa con defecto (DEF-A11, hallazgo 29) |
 | CP-RNF01-03 (SEC-03) | Acceso a datos de otra persona | RNF-01 (1, 2) | Prueba de ataque: IDOR con dos cuentas | Seguridad | Pasa con defecto (DEF-A10, hallazgo 28) |
@@ -35,6 +38,8 @@ Los resultados esperados salen de los criterios de aceptación de `docs/requisit
 Ejecución: 2026-11-26 contra el ambiente QA local (`env/docker-compose.qa.yml`), con `synapseed\src\backend\.venv\Scripts\python -m pytest tests/auth-seguridad`. Última corrida completa: 2026-11-27. Resultado: 47 pruebas pasan y 18 fallan como se esperaba (`xfail`): 4 de DEF-A12, 2 de DEF-A13 y 12 de las verificaciones de seguridad. La cobertura de las pruebas unitarias está en `reports/coverage/auth-seguridad-unit.txt` y `.xml`: 100% de `app/schemas/auth.py`, 91% de `app/schemas/user.py` y 70% de `app/core/security.py`; lo que falta de este último (`get_current_user`) necesita base de datos y lo cubren las pruebas de integración. El detalle de los ataques está en `tests/auth-seguridad/security/verificaciones.md`. Los escenarios de carga se corren con k6 (`tests/auth-seguridad/performance/run_k6.sh`) y sus resultados están en `tests/auth-seguridad/performance/resultados.md`. La salida completa de cada corrida queda en `reports/`.
 
 Los casos de RF-01, RF-02 y los defectos DEF-A01 y DEF-A11 también se verifican por la API con Postman (`tests/auth-seguridad/api/auth-seguridad.postman_collection.json`): cada request lleva el ID de su caso. Corrida del 2026-11-27: 13 requests y 23 aserciones, 21 pasan y 2 fallan, que son justo las de DEF-A01 y DEF-A11. Salida en `reports/postman/auth-seguridad.txt`.
+
+Los casos CP-RF01-08, CP-RF02-06 y CP-RF02-07 recorren la interfaz web con Playwright (`tests/auth-seguridad/e2e/auth.spec.js`). Corrida del 2026-11-27: 3 de 3 pasan; antes se repitieron 5 veces cada una (15 de 15) para descartar inestabilidad. Salida en `reports/e2e/auth-seguridad.txt`.
 
 Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(strict=True, reason="Hallazgo N ...")`: la suite queda en verde, el defecto queda visible en el reporte como `XFAIL` y, si alguien lo corrige, la prueba pasa a `XPASS` y la suite falla para que se quite la marca.
 
@@ -178,6 +183,26 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (4 `XFAIL`) |
 | Responsable | Ben Farz |
 
+## CP-RF01-08
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RF01-08 |
+| Nombre | Registro por la interfaz web |
+| Objetivo | Verificar que una persona puede crear su cuenta desde el formulario web y queda lista para iniciar sesión |
+| Requerimiento asociado | RF-01, criterio 1 |
+| Tipo y nivel de prueba | Funcional, sistema (E2E con Playwright) |
+| Prioridad | Alta |
+| Característica 25010 que evidencia | Adecuación funcional (completitud) |
+| Precondiciones | Ambiente QA local arriba, frontend en `127.0.0.1:5173` |
+| Datos de prueba | Cuenta sintética nueva con cédula de 9 dígitos que empieza en 4, teléfono 88880000 |
+| Pasos, o nombre de la prueba automatizada | `CP-RF01-08 registro por la interfaz y redireccion al login`: abrir el login, ir a "Crear cuenta", llenar el formulario, enviar y confirmar por la API que la cuenta inicia sesión |
+| Resultado esperado | La interfaz da formato a la cédula (`4 1234 5678`) y al teléfono (`8888 - 0000`), el backend responde 201, la interfaz lleva al login y la cuenta puede iniciar sesión con la cédula sin espacios |
+| Resultado obtenido | Igual al esperado |
+| Estado | Pasa |
+| Evidencia | `reports/e2e/auth-seguridad.txt` (corrida del 2026-11-27) |
+| Responsable | Ben Farz |
+
 ## CP-RF02-01
 
 | Campo | Valor |
@@ -276,6 +301,46 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 200 con el perfil propio; 401 sin token |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
+| Responsable | Ben Farz |
+
+## CP-RF02-06
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RF02-06 |
+| Nombre | Login por la interfaz y acceso a una ruta protegida |
+| Objetivo | Verificar que, con credenciales correctas, la interfaz inicia sesión, lleva a la gestión de zonas y mantiene la sesión al recargar |
+| Requerimiento asociado | RF-02, criterios 1 y 5 |
+| Tipo y nivel de prueba | Funcional, sistema (E2E con Playwright) |
+| Prioridad | Alta |
+| Característica 25010 que evidencia | Adecuación funcional (completitud) |
+| Precondiciones | Ambiente QA local arriba; cuenta sintética registrada por la API al inicio de la prueba |
+| Datos de prueba | Cédula y contraseña de la cuenta nueva |
+| Pasos, o nombre de la prueba automatizada | `CP-RF02-06 login por la interfaz entra a la zona protegida` |
+| Resultado esperado | El backend responde 200, la interfaz lleva a `/zones` con el título "Gestión de zonas" y, al recargar, sigue en `/zones` |
+| Resultado obtenido | Igual al esperado |
+| Estado | Pasa |
+| Evidencia | `reports/e2e/auth-seguridad.txt` (corrida del 2026-11-27) |
+| Responsable | Ben Farz |
+
+## CP-RF02-07
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RF02-07 |
+| Nombre | Sin sesión o con contraseña incorrecta no hay acceso |
+| Objetivo | Verificar que la interfaz no deja entrar a una ruta protegida sin sesión ni después de un login fallido |
+| Requerimiento asociado | RF-02, criterios 3 y 5 |
+| Tipo y nivel de prueba | Funcional y seguridad, sistema (E2E con Playwright) |
+| Prioridad | Alta |
+| Característica 25010 que evidencia | Seguridad (autenticidad) |
+| Precondiciones | Ambiente QA local arriba; cuenta sintética registrada por la API; navegador sin sesión |
+| Datos de prueba | Cédula de la cuenta nueva con una contraseña incorrecta |
+| Pasos, o nombre de la prueba automatizada | `CP-RF02-07 sin sesion o con contrasena incorrecta no se entra a rutas protegidas`: abrir `/zones` sin sesión, intentar el login con contraseña incorrecta y volver a abrir `/zones` |
+| Resultado esperado | `/zones` redirige a `/login`; el login fallido muestra "No se pudo iniciar sesión" con el mensaje "Cédula o contraseña incorrectos" y no sale del login; `/zones` sigue redirigiendo |
+| Resultado obtenido | Igual al esperado |
+| Estado | Pasa |
+| Evidencia | `reports/e2e/auth-seguridad.txt` (corrida del 2026-11-27) |
 | Responsable | Ben Farz |
 
 ## CP-RNF01-01

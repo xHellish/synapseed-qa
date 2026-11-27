@@ -7,7 +7,8 @@ import { defineConfig, devices } from "@playwright/test";
 // Constantes
 // ---------------------------------------------
 // URL del frontend bajo prueba, configurable con QA_WEB_URL
-const WEB_URL = process.env.QA_WEB_URL || "http://localhost:5173";
+// 127.0.0.1 y no localhost: en Windows localhost intenta IPv6 primero y agrega ~2 s por peticion
+const WEB_URL = process.env.QA_WEB_URL || "http://127.0.0.1:5173";
 
 // =============================================
 // Configuracion

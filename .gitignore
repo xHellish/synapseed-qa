@@ -22,3 +22,5 @@ __pycache__/
 htmlcov/
 test-results/
 playwright-report/
+# Reporte HTML de Playwright: pesa varios MB y cada corrida lo reemplaza; se entrega la salida de consola
+reports/e2e/html/

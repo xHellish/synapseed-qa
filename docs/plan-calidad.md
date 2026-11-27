@@ -209,9 +209,9 @@ La ejecución de pruebas dinámicas de un área empieza cuando se cumplen todos:
 | 2026-11-25 | Estructura del repo QA, reparto por área y plantillas | Equipo | Hecho |
 | 2026-11-26 | Requerimientos, ambiente QA local, casos y pruebas de RF-01 y RF-02, seguridad y carga | Ben Farz | Hecho |
 | 2026-11-27 | Defectos de A y plan de calidad | Ben Farz | Hecho |
+| 2026-11-27 | OWASP ZAP, Postman y E2E de autenticación | Ben Farz | Hecho |
 | 2026-11-27 a 28 | Revisión de requerimientos, inspección formal, Ruff, SonarQube, GQM y casos de RF-03 y RF-04 | Kevin Alanis | Planificado |
 | 2026-11-27 a 28 | Casos de RF-05 y RF-06, fiabilidad, Playwright y defectos de C | Josué Calderón | Planificado |
-| 2026-11-28 | OWASP ZAP, Postman y E2E de autenticación | Ben Farz | Planificado |
 | 2026-11-28 a 29 | UAT, prueba de usabilidad y revisión WCAG | Josué Calderón y Kevin Alanis | Planificado |
 | 2026-11-29 | Matriz de trazabilidad, consolidación de defectos e informe final | Equipo | Planificado |
 | 2026-11-30 | Entrega | Equipo | Planificado |
