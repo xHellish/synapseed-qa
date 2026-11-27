@@ -13,6 +13,12 @@ Ejecución: 2026-11-26, con `synapseed\src\backend\.venv\Scripts\python -m pytes
 | SEC-05 | Los errores no exponen detalles internos | Configuración de seguridad (OWASP A05) | `test_cp_rnf01_05_error_500_sin_traceback` | **Falla.** Un 500 devuelve el traceback completo de Python con rutas del servidor (hallazgo 14). La causa es `debug: bool = True` por defecto en `app/config.py` |
 | SEC-06 | El login limita los intentos fallidos | Autenticación (OWASP A07) | `test_cp_rnf01_06_login_limita_intentos_fallidos` | **Falla.** 30 contraseñas incorrectas seguidas contra la misma cédula responden 401, sin 429 ni bloqueo, a unos 4 intentos por segundo; después la contraseña correcta sigue funcionando (hallazgo 30) |
 
+Verificación adicional, fuera de las 6 mínimas:
+
+| ID | Verificación | Tipo | Prueba o herramienta | Resultado |
+|----|--------------|------|----------------------|-----------|
+| SEC-07 | Nadie fabrica tokens válidos con un secreto JWT conocido | Autenticación y configuración (OWASP A02, A05, A07) | `unit/test_security_helpers.py` (`test_cp_rnf01_07_*`) y `security/forge_token_check.py` | **Falla.** El backend arranca en producción con el secreto por defecto o el de `.env.example`, y con ese secreto un token fabricado sin login dio acceso al perfil y a las zonas del usuario 900000001 (hallazgo 33, DEF-A13). Evidencia: `reports/manual/def-jwt-secreto-publico.txt` |
+
 ## Detalle de los ataques
 
 ### SEC-01 Restablecimiento de contraseña

@@ -1,0 +1,77 @@
+...................xxxx.......xx                                         [100%]
+
+---------- coverage: platform win32, python 3.12.16-final-0 ----------
+Name                                                                  Stmts   Miss  Cover   Missing
+---------------------------------------------------------------------------------------------------
+synapseed\src\backend\app\__init__.py                                     2      0   100%
+synapseed\src\backend\app\agents\__init__.py                              2      2     0%   3-5
+synapseed\src\backend\app\agents\analyzer_agent.py                        8      8     0%   3-33
+synapseed\src\backend\app\agents\legal_validator_agent.py                84     84     0%   3-226
+synapseed\src\backend\app\agents\orchestrator.py                         46     46     0%   3-91
+synapseed\src\backend\app\agents\prompts\__init__.py                      0      0   100%
+synapseed\src\backend\app\agents\prompts\analyzer.py                      2      2     0%   4-12
+synapseed\src\backend\app\agents\prompts\legal_validator.py               2      2     0%   4-12
+synapseed\src\backend\app\agents\prompts\synthesizer.py                   2      2     0%   4-18
+synapseed\src\backend\app\agents\researcher_agent.py                     12     12     0%   3-31
+synapseed\src\backend\app\agents\state.py                                17     17     0%   3-27
+synapseed\src\backend\app\agents\synthesizer_agent.py                    65     65     0%   3-160
+synapseed\src\backend\app\api\__init__.py                                 0      0   100%
+synapseed\src\backend\app\api\v1\__init__.py                              0      0   100%
+synapseed\src\backend\app\api\v1\auth.py                                 27     27     0%   3-58
+synapseed\src\backend\app\api\v1\catalogs.py                             62     62     0%   1-192
+synapseed\src\backend\app\api\v1\health.py                               18     18     0%   1-27
+synapseed\src\backend\app\api\v1\recommendations.py                     122    122     0%   1-345
+synapseed\src\backend\app\api\v1\router.py                                6      6     0%   3-11
+synapseed\src\backend\app\api\v1\users.py                                23     23     0%   3-66
+synapseed\src\backend\app\api\v1\zones.py                               162    162     0%   1-327
+synapseed\src\backend\app\config.py                                      58      6    90%   92-95, 101, 106
+synapseed\src\backend\app\core\__init__.py                                0      0   100%
+synapseed\src\backend\app\core\redis.py                                   8      8     0%   1-13
+synapseed\src\backend\app\core\security.py                               40     12    70%   63-80
+synapseed\src\backend\app\core\supabase.py                              109     75    31%   18-20, 53-57, 61-62, 69-82, 87-97, 108-128, 147-161, 166-177, 182-203, 213-234
+synapseed\src\backend\app\db\__init__.py                                  3      3     0%   3-6
+synapseed\src\backend\app\db\base.py                                      3      3     0%   3-19
+synapseed\src\backend\app\db\seed.py                                    240    240     0%   3-497
+synapseed\src\backend\app\db\session.py                                  30     30     0%   3-87
+synapseed\src\backend\app\dependencies.py                                23     23     0%   3-57
+synapseed\src\backend\app\main.py                                        52     52     0%   16-167
+synapseed\src\backend\app\models\__init__.py                             10      0   100%
+synapseed\src\backend\app\models\audit_log.py                            28      0   100%
+synapseed\src\backend\app\models\base.py                                 20      5    75%   47-51
+synapseed\src\backend\app\models\distributor.py                          25      0   100%
+synapseed\src\backend\app\models\lmr.py                                  11      0   100%
+synapseed\src\backend\app\models\product.py                              37      0   100%
+synapseed\src\backend\app\models\recommendation.py                       57      0   100%
+synapseed\src\backend\app\models\regulation.py                           27      0   100%
+synapseed\src\backend\app\models\user.py                                 21      0   100%
+synapseed\src\backend\app\models\zone.py                                 19      0   100%
+synapseed\src\backend\app\repositories\__init__.py                        9      9     0%   12-21
+synapseed\src\backend\app\repositories\audit_repository.py               23     23     0%   1-95
+synapseed\src\backend\app\repositories\base.py                           42     42     0%   1-88
+synapseed\src\backend\app\repositories\distributor_repository.py         54     54     0%   1-131
+synapseed\src\backend\app\repositories\lmr_repository.py                 53     53     0%   3-108
+synapseed\src\backend\app\repositories\product_repository.py            156    156     0%   3-356
+synapseed\src\backend\app\repositories\recommendation_repository.py      64     64     0%   1-192
+synapseed\src\backend\app\repositories\regulation_repository.py          31     31     0%   3-65
+synapseed\src\backend\app\repositories\user_repository.py                38     38     0%   1-93
+synapseed\src\backend\app\repositories\zone_repository.py                28     28     0%   1-71
+synapseed\src\backend\app\schemas\__init__.py                             6      0   100%
+synapseed\src\backend\app\schemas\agent_context.py                       19      0   100%
+synapseed\src\backend\app\schemas\agent_legal.py                         18      0   100%
+synapseed\src\backend\app\schemas\agent_products.py                      21      0   100%
+synapseed\src\backend\app\schemas\agent_recommendations.py               31      0   100%
+synapseed\src\backend\app\schemas\auth.py                                24      0   100%
+synapseed\src\backend\app\schemas\common.py                              50     50     0%   1-81
+synapseed\src\backend\app\schemas\farmer_input.py                        14      0   100%
+synapseed\src\backend\app\schemas\user.py                                91      8    91%   81-83, 88-90, 110, 115
+synapseed\src\backend\app\services\__init__.py                            3      0   100%
+synapseed\src\backend\app\services\auth_service.py                      158    132    16%   29-31, 42-43, 51-52, 63-65, 69-70, 79-84, 94-147, 159-191, 196, 215-259, 270-291, 300-316, 321-340
+synapseed\src\backend\app\services\llm_client.py                         82     53    35%   62-75, 83-92, 102-131, 139-150, 158-159, 163, 172-178, 186-189
+synapseed\src\backend\app\workers\__init__.py                             0      0   100%
+synapseed\src\backend\app\workers\celery_app.py                           5      5     0%   9-24
+synapseed\src\backend\app\workers\tasks.py                               84     84     0%   3-170
+---------------------------------------------------------------------------------------------------
+TOTAL                                                                  2587   1947    25%
+Coverage XML written to file reports/coverage/auth-seguridad-unit.xml
+
+26 passed, 33 deselected, 6 xfailed in 11.23s

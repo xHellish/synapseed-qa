@@ -120,7 +120,7 @@ Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Cal
 
    ```bash
    bash tests/auth-seguridad/performance/run_k6.sh auth_read_load.js perf-01
-   bash tests/auth-seguridad/performance/run_k6.sh recommendation_load.js perf-02-delay-0
+   bash tests/auth-seguridad/performance/run_k6.sh recommendation_load.js perf-02-rampa-delay-0
    ```
 
 ## Organización del trabajo

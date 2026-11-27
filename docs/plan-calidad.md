@@ -85,7 +85,7 @@ Los escenarios corren en el ambiente QA local con el LLM falso, así que miden l
 | | | p95 del login | Menos de 1000 ms | Plan |
 | | | p95 de las lecturas (perfil, catálogo, zonas) | Menos de 500 ms | Plan |
 | | | Verificaciones de contenido que pasan | Más de 99% | Plan |
-| PERF-02 Recomendaciones simultáneas (`recommendation_load.js`) | 10 usuarios virtuales que piden 2 recomendaciones cada uno (20 en total) y consultan el estado cada 2 s hasta el final | p95 de `POST /recommendations/request` | Menos de 1000 ms | RNF-04, criterio 2 |
+| PERF-02 Recomendaciones simultáneas (`recommendation_load.js`) | Escalones crecientes de 2, 5 y 10 usuarios virtuales, 1 min cada uno. Cada usuario pide una recomendación, consulta el estado cada 2 s hasta el final y vuelve a pedir | p95 de `POST /recommendations/request` | Menos de 1000 ms | RNF-04, criterio 2 |
 | | | p95 del tiempo de solicitud a resultado | 50 s o menos | RNF-04, criterio 1 (MVP: 10 a 50 s) |
 | | | Recomendaciones que terminan en `COMPLETED` | 100% | RNF-03, criterio 1 |
 
@@ -95,6 +95,8 @@ PERF-02 se corre dos veces:
 - **LLM con 3 s por llamada** (`FAKE_LLM_DELAY_MS=3000`): se acerca a un proveedor real, sin llegar a los 103 s medidos con OpenRouter (hallazgo 21).
 
 Los umbrales son los mismos en las dos corridas.
+
+**Cambio del 2026-11-27.** La primera versión de PERF-02 usaba una carga fija de 10 usuarios con 2 solicitudes cada uno (corridas `perf-02-delay-0` y `perf-02-delay-3000`, que se conservan en `reports/k6/`). El enunciado pide carga creciente, así que el perfil pasa a escalones de 2, 5 y 10 usuarios. Los umbrales no cambian; el tiempo de solicitud a resultado se reporta además por escalón (`recommendation_total_ms{load:N}`, con el mismo umbral de 50 s) para ver cómo se degrada al aumentar la carga. Este cambio se declara antes de correr el nuevo perfil.
 
 ## Estrategia de pruebas
 
@@ -133,7 +135,7 @@ Probabilidad e impacto en escala Alta, Media o Baja. La prioridad combina ambos:
 
 | ID | Riesgo | Tipo | Probabilidad | Impacto | Prioridad | Mitigación |
 |----|--------|------|--------------|---------|-----------|------------|
-| R-01 | Una persona toma o usa la cuenta de otra | Producto | Alta | Alto | Alta | SEC-01, SEC-02, SEC-03 y SEC-06. Se materializó: DEF-A01, DEF-A03 |
+| R-01 | Una persona toma o usa la cuenta de otra | Producto | Alta | Alto | Alta | SEC-01, SEC-02, SEC-03, SEC-06 y SEC-07. Se materializó: DEF-A01, DEF-A03, DEF-A13 |
 | R-02 | Se recomienda un producto prohibido, cancelado o no pertinente | Producto | Media | Alto | Alta | Casos de RF-05 y RNF-05 con productos especiales del seed sintético (`QA-PROHIBIDO-1`, `QA-CANCELADO-1`); revisión de pertinencia con criterio agronómico |
 | R-03 | Una recomendación nunca termina y la persona espera sin respuesta | Producto | Alta | Alto | Alta | Fallos inducidos con el LLM falso (RNF-03). Ya observado en los hallazgos 12, 13 y 19 |
 | R-04 | Los datos personales quedan expuestos en errores o a otras personas | Producto | Media | Alto | Alta | SEC-03 y SEC-05. Se materializó: DEF-A02, DEF-A10 |

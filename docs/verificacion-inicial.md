@@ -91,7 +91,13 @@ Encontrados el 2026-11-26 con k6 (`tests/auth-seguridad/performance/`) contra el
 
 31. **El login bloquea todo el backend mientras calcula bcrypt.** `authenticate_user` y `register_user` son funciones `async`, pero llaman a `verify_password` y `get_password_hash` (passlib con bcrypt) de forma síncrona, sin `run_in_threadpool`. Cada login ocupa el event loop unos 240 ms, y durante ese tiempo el proceso no atiende ninguna otra petición. Evidencia en `reports/k6/perf-01-diagnostico.txt`: el catálogo de cultivos, que no usa bcrypt ni token, pasa de una mediana de 10.4 ms a 2403 ms mientras hay 10 logins simultáneos, casi exactamente 10 x 250 ms. En PERF-01, con 20 usuarios, el p95 del login fue 5.12 s y el de las lecturas 2.06 s. Afecta el modo de autenticación local y el respaldo con hash local; en modo Supabase el login es una llamada HTTP asíncrona. El `docker-compose.yml` de SynapSeed levanta un solo proceso de uvicorn, igual que el ambiente QA; el `Dockerfile` de producción usa 2 workers de gunicorn, lo que reduce el efecto a la mitad pero no lo elimina.
 
-32. **El pipeline atiende una recomendación a la vez, así que la meta de 10 a 50 s solo se cumple con una persona.** La Spec (línea 201) y `Dockerfile.worker` fijan el worker de Celery con `--concurrency=1`. En PERF-02, con el LLM falso a 3 s por llamada, una recomendación sola tarda 11 s, pero 20 solicitudes de 10 personas terminan con p95 de 94 s y la última a los 95 s: cada una espera a las anteriores. Con el LLM real (103 s medidos en el hallazgo 21), la décima persona en pedir esperaría más de 15 minutos. Es una contradicción entre dos decisiones de la Spec, la concurrencia de 1 y el tiempo de 10 a 50 s, más que un error de código. Evidencia: `reports/k6/perf-02-delay-3000.txt`.
+32. **El pipeline atiende una recomendación a la vez, así que la meta de 10 a 50 s solo se cumple con una persona.** La Spec (línea 201) y `Dockerfile.worker` fijan el worker de Celery con `--concurrency=1`. En PERF-02, con el LLM falso a 3 s por llamada, una recomendación sola tarda 11 s, pero 20 solicitudes de 10 personas terminan con p95 de 94 s y la última a los 95 s: cada una espera a las anteriores. Con el LLM real (103 s medidos en el hallazgo 21), la décima persona en pedir esperaría más de 15 minutos. Es una contradicción entre dos decisiones de la Spec, la concurrencia de 1 y el tiempo de 10 a 50 s, más que un error de código. Con carga creciente (2026-11-27) el p95 fue de 19.4 s con 2 personas, 49.0 s con 5 y 93 s con 10. Evidencia: `reports/k6/perf-02-delay-3000.txt` y `reports/k6/perf-02-rampa-delay-3000.txt`.
+
+## Hallazgos de la revisión de la configuración de seguridad
+
+Encontrado el 2026-11-27 al escribir las pruebas unitarias de `app/core/security.py` y verificado con un backend temporal en el ambiente QA local.
+
+33. **El backend acepta un secreto JWT público y con él cualquiera fabrica tokens válidos.** `app/config.py` define `jwt_secret` con el valor por defecto `"change-me-in-production"`, y `.env.example` publica otro valor fijo. Nada impide arrancar en producción con cualquiera de los dos. Además, `resolve_user_from_token` intenta primero validar el token como JWT local en cualquier modo, también con Supabase configurado. Con un backend levantado con el secreto de `.env.example`, un token fabricado para el id 1, sin contraseña ni login, dio acceso al perfil y a las zonas de esa persona. Evidencia: `reports/manual/def-jwt-secreto-publico.txt`.
 
 ## Hallazgos formalizados como defectos
 
@@ -102,6 +108,7 @@ Los hallazgos se formalizan en `docs/defectos.md`, con severidad, prioridad, pas
 | 27 | DEF-A01 | Crítica |
 | 14 | DEF-A02 | Alta |
 | 30 | DEF-A03 | Alta |
+| 33 | DEF-A13 | Alta |
 | 26 | DEF-A04 | Alta |
 | 25 | DEF-A05 | Alta |
 | 31 | DEF-A06 | Alta |

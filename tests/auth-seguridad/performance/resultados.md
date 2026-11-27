@@ -2,15 +2,16 @@
 
 Responsable: Ben Farz (Persona A). Requerimiento: RNF-04 (y RNF-03, criterio 1). Umbrales declarados antes de correr, en `docs/plan-calidad.md`. Solo contra el ambiente QA local, con el LLM falso y usuarios sintéticos (cédulas que empiezan en 7).
 
-Ejecución: 2026-11-26, k6 1.0.0 en Docker (`run_k6.sh`), en una sola máquina con Docker dentro de WSL. El backend corre un solo proceso de uvicorn, como el `docker-compose.yml` de SynapSeed.
+Ejecución: 2026-11-26 (PERF-01 y la primera versión de PERF-02) y 2026-11-27 (PERF-02 por escalones), k6 1.0.0 en Docker (`run_k6.sh`), en una sola máquina con Docker dentro de WSL. El backend corre un solo proceso de uvicorn, como el `docker-compose.yml` de SynapSeed.
 
 ## Resumen
 
 | Escenario | Corrida | Umbrales cumplidos | Evidencia |
 |-----------|---------|--------------------|-----------|
 | PERF-01 Autenticación y lectura | 20 usuarios virtuales | 2 de 4 | `reports/k6/perf-01.txt`, `perf-01.json`, `perf-01-diagnostico.txt` |
-| PERF-02 Recomendaciones simultáneas | LLM sin latencia | 3 de 3 | `reports/k6/perf-02-delay-0.txt`, `.json` |
-| PERF-02 Recomendaciones simultáneas | LLM con 3 s por llamada | 2 de 3 | `reports/k6/perf-02-delay-3000.txt`, `.json` |
+| PERF-02 Recomendaciones simultáneas | Escalones de 2, 5 y 10 usuarios, LLM sin latencia | 6 de 6 | `reports/k6/perf-02-rampa-delay-0.txt`, `.json` |
+| PERF-02 Recomendaciones simultáneas | Escalones de 2, 5 y 10 usuarios, LLM con 3 s por llamada | 4 de 6 | `reports/k6/perf-02-rampa-delay-3000.txt`, `.json` |
+| PERF-02, primera versión con carga fija | 10 usuarios, sin latencia y con 3 s | 3 de 3 y 2 de 3 | `reports/k6/perf-02-delay-0.*`, `perf-02-delay-3000.*` |
 
 ## PERF-01 Autenticación y lectura
 
@@ -35,15 +36,31 @@ El catálogo no usa bcrypt ni token, y aun así espera casi 10 x 250 ms: el bcry
 
 ## PERF-02 Recomendaciones simultáneas
 
-10 usuarios virtuales piden 2 recomendaciones cada uno (20 en total) y consultan el estado cada 2 s.
+Carga creciente en escalones de 2, 5 y 10 usuarios virtuales, 1 min cada uno, ejecutada el 2026-11-27. Cada usuario pide una recomendación, consulta el estado cada 2 s hasta el final y vuelve a pedir. El tiempo de cada recomendación se asigna al escalón activo cuando se pidió.
 
 | Métrica | Umbral | LLM sin latencia | LLM con 3 s por llamada |
 |---------|--------|------------------|-------------------------|
-| p95 de `POST /recommendations/request` | Menos de 1000 ms | 837 ms, cumple | 704 ms, cumple |
-| p95 de solicitud a resultado | 50 s o menos | 5.6 s, cumple | **94 s, no cumple** (mínimo 11 s, máximo 95 s) |
-| Recomendaciones en `COMPLETED` | 100% | 100% (20 de 20), cumple | 100% (20 de 20), cumple |
+| Recomendaciones procesadas | | 456 | 34 |
+| p95 de `POST /recommendations/request` | Menos de 1000 ms | 544 ms, cumple | 271 ms, cumple |
+| p95 de solicitud a resultado, total | 50 s o menos | 4.9 s, cumple | **92 s, no cumple** |
+| p95 con 2 usuarios | 50 s o menos | 2.2 s, cumple | 19.4 s, cumple |
+| p95 con 5 usuarios | 50 s o menos | 3.4 s, cumple | 49.0 s, cumple al límite |
+| p95 con 10 usuarios | 50 s o menos | 5.1 s, cumple | **93 s, no cumple** |
+| Recomendaciones en `COMPLETED` | 100% | 100% (456 de 456), cumple | 100% (34 de 34), cumple |
 
-El sistema no pierde ninguna recomendación bajo carga, y la solicitud responde sin esperar al pipeline. Lo que no escala es el tiempo de entrega: el worker procesa una recomendación a la vez (`--concurrency=1`, fijado en la Spec), así que cada solicitud espera a las anteriores. Con 3 s por llamada al LLM, una recomendación sola tarda 11 s, pero la vigésima de la cola tarda 95 s (hallazgo 32).
+El sistema no pierde ninguna recomendación bajo carga, y la solicitud responde sin esperar al pipeline. Lo que no escala es el tiempo de entrega. El worker procesa una recomendación a la vez (`--concurrency=1`, fijado en la Spec), así que el tiempo crece casi en proporción a la cantidad de personas: con 3 s por llamada al LLM, una recomendación sola tarda 10.5 s, con 5 personas el p95 roza los 50 s y con 10 los duplica (hallazgo 32). Con el LLM real, que tardó 103 s con una sola persona (hallazgo 21), el umbral no se cumpliría ni siquiera sin carga.
+
+La latencia de 3 s se verificó por el efecto en los tiempos (una recomendación sola: 10.5 s contra 2.1 s sin latencia). El LLM falso se devolvió a 0 ms al terminar.
+
+### Primera versión de PERF-02 (carga fija)
+
+Corrida el 2026-11-26 con 10 usuarios fijos y 2 solicitudes cada uno, antes de pasar a carga creciente. Se conserva como evidencia y coincide con la versión por escalones:
+
+| Métrica | LLM sin latencia | LLM con 3 s por llamada |
+|---------|------------------|-------------------------|
+| p95 de la solicitud | 837 ms | 704 ms |
+| p95 de solicitud a resultado | 5.6 s | 94 s |
+| Recomendaciones en `COMPLETED` | 20 de 20 | 20 de 20 |
 
 ## Limitaciones
 

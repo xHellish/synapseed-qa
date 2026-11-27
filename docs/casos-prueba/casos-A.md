@@ -26,10 +26,11 @@ Los resultados esperados salen de los criterios de aceptación de `docs/requisit
 | CP-RNF01-04 (SEC-04) | Validación de entrada en zonas | RNF-01 (5) | Partición: campo extra, tipo incorrecto, HTML | Seguridad | Falla (DEF-A08, hallazgo 15) |
 | CP-RNF01-05 (SEC-05) | Detalles internos en errores | RNF-01 (7) | Adivinación de errores: provocar un 500 | Seguridad | Falla (DEF-A02, hallazgo 14) |
 | CP-RNF01-06 (SEC-06) | Fuerza bruta en el login | RNF-01 (8) | Prueba de ataque: 30 intentos seguidos | Seguridad | Falla (DEF-A03, hallazgo 30) |
+| CP-RNF01-07 | Secreto JWT público | RNF-01 (1, 6) | Prueba de ataque: token fabricado con un secreto conocido | Unitaria y seguridad | Falla (DEF-A13, hallazgo 33) |
 | CP-RNF04-01 (PERF-01) | Carga de autenticación y lectura | RNF-04 (3) | Prueba de carga con umbrales previos | Rendimiento | Falla (DEF-A06, hallazgo 31) |
 | CP-RNF04-02 (PERF-02) | Recomendaciones simultáneas | RNF-04 (1, 2), RNF-03 (1) | Prueba de carga con umbrales previos | Rendimiento | Pasa sin latencia; falla con latencia (DEF-A07, hallazgo 32) |
 
-Ejecución: 2026-11-26 contra el ambiente QA local (`env/docker-compose.qa.yml`), con `synapseed\src\backend\.venv\Scripts\python -m pytest tests/auth-seguridad`. Resultado: 41 pruebas pasan y 16 fallan como se esperaba (`xfail`): 4 del hallazgo 17 y 12 de las verificaciones de seguridad. El detalle de los ataques está en `tests/auth-seguridad/security/verificaciones.md`. Los escenarios de carga se corren con k6 (`tests/auth-seguridad/performance/run_k6.sh`) y sus resultados están en `tests/auth-seguridad/performance/resultados.md`. La salida completa de cada corrida queda en `reports/`.
+Ejecución: 2026-11-26 contra el ambiente QA local (`env/docker-compose.qa.yml`), con `synapseed\src\backend\.venv\Scripts\python -m pytest tests/auth-seguridad`. Última corrida completa: 2026-11-27. Resultado: 47 pruebas pasan y 18 fallan como se esperaba (`xfail`): 4 de DEF-A12, 2 de DEF-A13 y 12 de las verificaciones de seguridad. La cobertura de las pruebas unitarias está en `reports/coverage/auth-seguridad-unit.txt` y `.xml`: 100% de `app/schemas/auth.py`, 91% de `app/schemas/user.py` y 70% de `app/core/security.py`; lo que falta de este último (`get_current_user`) necesita base de datos y lo cubren las pruebas de integración. El detalle de los ataques está en `tests/auth-seguridad/security/verificaciones.md`. Los escenarios de carga se corren con k6 (`tests/auth-seguridad/performance/run_k6.sh`) y sus resultados están en `tests/auth-seguridad/performance/resultados.md`. La salida completa de cada corrida queda en `reports/`.
 
 Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(strict=True, reason="Hallazgo N ...")`: la suite queda en verde, el defecto queda visible en el reporte como `XFAIL` y, si alguien lo corrige, la prueba pasa a `XPASS` y la suite falla para que se quite la marca.
 
@@ -126,7 +127,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Característica 25010 que evidencia | Seguridad (confidencialidad) |
 | Precondiciones | Usuario recién registrado en el ambiente QA local; acceso de lectura a la base local (`127.0.0.1:5433`) |
 | Datos de prueba | El usuario de prueba y su contraseña |
-| Pasos, o nombre de la prueba automatizada | `test_cp_rf01_05_contrasena_guardada_con_bcrypt` |
+| Pasos, o nombre de la prueba automatizada | `test_cp_rf01_05_contrasena_guardada_con_bcrypt` (integración, lee la base); `test_cp_rf01_05_hash_bcrypt_y_verificacion` (unitaria, `unit/test_security_helpers.py`) |
 | Resultado esperado | `users.password_hash` es distinto de la contraseña y tiene el prefijo de bcrypt (`$2b$` o `$2a$`) |
 | Resultado obtenido | Hash con prefijo `$2b$` |
 | Estado | Pasa |
@@ -206,9 +207,9 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Característica 25010 que evidencia | Seguridad (autenticidad) |
 | Precondiciones | Usuario registrado; `JWT_EXPIRE_HOURS` con su valor por defecto |
 | Datos de prueba | Token recibido en el login |
-| Pasos, o nombre de la prueba automatizada | `test_cp_rf02_02_expiracion_del_jwt` (lee los claims del token sin verificar la firma) |
-| Resultado esperado | `exp - iat` igual a 86400 s (24 horas) y `expires_in` igual a 86400 |
-| Resultado obtenido | 86400 en ambos |
+| Pasos, o nombre de la prueba automatizada | `test_cp_rf02_02_expiracion_del_jwt` (integración, lee los claims del token sin verificar la firma); `test_cp_rf02_02_token_expira_segun_configuracion` y `test_cp_rf02_02_token_vencido_se_rechaza` (unitarias, `unit/test_security_helpers.py`) |
+| Resultado esperado | `exp - iat` igual a 86400 s (24 horas) y `expires_in` igual a 86400; un token legítimo pero vencido se rechaza con 401 |
+| Resultado obtenido | 86400 en ambos; el token vencido se rechaza con 401 |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Ben Farz |
@@ -393,6 +394,26 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Ben Farz |
 
+## CP-RNF01-07
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RNF01-07 |
+| Nombre | Secreto JWT público |
+| Objetivo | Verificar que nadie puede fabricar tokens válidos con un secreto JWT conocido |
+| Requerimiento asociado | RNF-01, criterios 1 y 6 |
+| Tipo y nivel de prueba | Seguridad; unitaria (configuración y validación del token) y sistema (backend temporal con el secreto de `.env.example`) |
+| Prioridad | Alta |
+| Característica 25010 que evidencia | Seguridad (autenticidad, confidencialidad) |
+| Precondiciones | Ninguna para las unitarias; para la verificación de sistema, ambiente QA arriba y un backend temporal en el puerto 8001 con el `JWT_SECRET` de `.env.example` |
+| Datos de prueba | Los dos secretos públicos: el valor por defecto de `app/config.py` y el de `.env.example`; token con `sub` 1 (usuario sintético 900000001) |
+| Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_07_produccion_rechaza_secreto_publico` (2 valores, xfail) y `test_cp_rnf01_07_secreto_por_defecto_permite_fabricar_tokens` (`unit/test_security_helpers.py`); verificación de sistema con `security/forge_token_check.py` |
+| Resultado esperado | La configuración de producción rechaza un secreto público, y un token que el servidor no emitió no da acceso |
+| Resultado obtenido | La configuración acepta ambos secretos en producción. El token fabricado con el secreto de `.env.example` da 200 en `/users/me` y `/zones` del usuario 900000001 sin login |
+| Estado | Falla; nuevo hallazgo 33 (DEF-A13) |
+| Evidencia | `reports/manual/def-jwt-secreto-publico.txt`; `reports/pytest/auth-seguridad.txt` y `.xml` |
+| Responsable | Ben Farz |
+
 ## CP-RNF04-01
 
 | Campo | Valor |
@@ -425,10 +446,10 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Prioridad | Alta |
 | Característica 25010 que evidencia | Eficiencia de desempeño (comportamiento temporal, capacidad); Fiabilidad (disponibilidad) |
 | Precondiciones | Ambiente QA local arriba; 10 usuarios sintéticos con sesión creados en el `setup`; LLM falso con 0 ms y luego con 3000 ms de latencia por llamada |
-| Datos de prueba | 10 usuarios virtuales, 2 solicitudes cada uno (20 en total), Tomate con Plagas; consulta del estado cada 2 s hasta `COMPLETED` o `FAILED` |
-| Pasos, o nombre de la prueba automatizada | `tests/auth-seguridad/performance/recommendation_load.js`, con `run_k6.sh recommendation_load.js perf-02-delay-0` y `perf-02-delay-3000` |
-| Resultado esperado | p95 de la solicitud menor a 1000 ms; p95 de solicitud a resultado de 50 s o menos; 100% en `COMPLETED` |
-| Resultado obtenido | Sin latencia: 837 ms, 5.6 s y 100%, cumple los tres. Con 3 s por llamada: 704 ms y 100%, pero p95 de solicitud a resultado de 94 s (una sola tarda 11 s; las demás esperan en cola) |
-| Estado | Pasa sin latencia; falla con latencia (1 de 3 umbrales); nuevo hallazgo 32 (DEF-A07) |
-| Evidencia | `reports/k6/perf-02-delay-0.txt` y `.json`, `reports/k6/perf-02-delay-3000.txt` y `.json` |
+| Datos de prueba | Escalones crecientes de 2, 5 y 10 usuarios virtuales, 1 min cada uno; Tomate con Plagas; consulta del estado cada 2 s hasta `COMPLETED` o `FAILED`, y nueva solicitud |
+| Pasos, o nombre de la prueba automatizada | `tests/auth-seguridad/performance/recommendation_load.js`, con `run_k6.sh recommendation_load.js perf-02-rampa-delay-0` y `perf-02-rampa-delay-3000` |
+| Resultado esperado | p95 de la solicitud menor a 1000 ms; p95 de solicitud a resultado de 50 s o menos, en total y en cada escalón; 100% en `COMPLETED` |
+| Resultado obtenido | Sin latencia: cumple los 6 umbrales (456 recomendaciones; p95 de 2.2 s, 3.4 s y 5.1 s con 2, 5 y 10 usuarios). Con 3 s por llamada: solicitud y `COMPLETED` cumplen, pero el p95 de solicitud a resultado sube de 19.4 s con 2 usuarios a 49.0 s con 5 y a 93 s con 10 (92 s en total): cada recomendación espera a las anteriores |
+| Estado | Pasa sin latencia; con latencia falla desde 10 usuarios (2 de 6 umbrales); nuevo hallazgo 32 (DEF-A07) |
+| Evidencia | `reports/k6/perf-02-rampa-delay-0.txt` y `.json`, `reports/k6/perf-02-rampa-delay-3000.txt` y `.json`; primera versión con carga fija en `perf-02-delay-0` y `perf-02-delay-3000` |
 | Responsable | Ben Farz |

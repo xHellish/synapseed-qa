@@ -26,6 +26,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | DEF-A01 | Restablecimiento de contraseña sin verificación permite tomar cualquier cuenta | Crítica | Alta | Abierto | CP-RNF01-01 (SEC-01) | Ben Farz |
 | DEF-A02 | Los errores 500 exponen el traceback y rutas internas | Alta | Alta | Abierto | CP-RNF01-05 (SEC-05) | Ben Farz |
 | DEF-A03 | El login no limita los intentos fallidos | Alta | Alta | Abierto | CP-RNF01-06 (SEC-06) | Ben Farz |
+| DEF-A13 | Con el secreto JWT por defecto o el de `.env.example`, cualquiera fabrica tokens válidos | Alta | Alta | Abierto | CP-RNF01-07 | Ben Farz |
 | DEF-A04 | Una instalación desde cero falla por enums incompatibles | Alta | Media | Abierto | Construcción del ambiente QA | Ben Farz |
 | DEF-A05 | El seed no carga productos porque sus CSV no están en el repo | Alta | Media | Abierto | Construcción del ambiente QA | Ben Farz |
 | DEF-A06 | El bcrypt del login bloquea todo el backend | Alta | Media | Abierto | CP-RNF04-01 (PERF-01) | Ben Farz |
@@ -149,10 +150,10 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Característica 25010 | Eficiencia de desempeño (capacidad, comportamiento temporal) |
 | Severidad | Alta |
 | Prioridad | Media |
-| Pasos para reproducir | 1. Levantar el ambiente QA con `FAKE_LLM_DELAY_MS=3000`. 2. Correr `run_k6.sh recommendation_load.js perf-02-delay-3000`: 10 usuarios piden 2 recomendaciones cada uno. 3. Leer `recommendation_total_ms` |
+| Pasos para reproducir | 1. Levantar el LLM falso con `FAKE_LLM_DELAY_MS=3000` (`up -d --force-recreate fake-llm`). 2. Correr `run_k6.sh recommendation_load.js perf-02-rampa-delay-3000`: escalones de 2, 5 y 10 usuarios que piden recomendaciones seguidas. 3. Leer `recommendation_total_ms` total y por escalón |
 | Resultado esperado | p95 del tiempo de solicitud a resultado de 50 s o menos (RNF-04, criterio 1) |
-| Resultado actual | Una recomendación sola tarda 11 s, pero el p95 es de 94 s y la última llega a los 95 s. Con el LLM real (103 s medidos, hallazgo 21) la décima persona esperaría más de 15 minutos |
-| Evidencia | `reports/k6/perf-02-delay-3000.txt` y `.json`; `tests/auth-seguridad/performance/resultados.md` |
+| Resultado actual | Una recomendación sola tarda 10.5 s. El p95 sube de 19.4 s con 2 usuarios a 49.0 s con 5 y a 93 s con 10 (92 s en total). La primera versión con carga fija dio el mismo resultado (p95 de 94 s). Con el LLM real (103 s medidos, hallazgo 21) la décima persona esperaría más de 15 minutos |
+| Evidencia | `reports/k6/perf-02-rampa-delay-3000.txt` y `.json`, `reports/k6/perf-02-delay-3000.txt`; `tests/auth-seguridad/performance/resultados.md` |
 | Estado | Abierto |
 | Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RNF04-02 (PERF-02). Hallazgo 32 |
@@ -241,3 +242,20 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Estado | Abierto |
 | Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RF01-07. Hallazgo 17 |
+
+### DEF-A13
+
+| Campo | Valor |
+|-------|-------|
+| Título | Con el secreto JWT por defecto o el de `.env.example`, cualquiera fabrica tokens válidos |
+| Descripción | `app/config.py` define `jwt_secret: str = "change-me-in-production"` y `.env.example` publica `JWT_SECRET` con otro valor fijo. La configuración no valida el secreto: el backend arranca igual en `production` con cualquiera de los dos. `resolve_user_from_token` intenta primero validar el token como JWT local en cualquier modo, también con Supabase configurado, así que con un secreto público cualquier persona firma un token con `sub` igual al id de otra y entra a su cuenta sin contraseña. El comentario de `.env.example` pide generar un valor aleatorio, pero nada lo exige |
+| Característica 25010 | Seguridad (autenticidad, confidencialidad, integridad) |
+| Severidad | Alta |
+| Prioridad | Alta |
+| Pasos para reproducir | 1. Con el ambiente QA arriba, levantar un backend temporal con el `JWT_SECRET` de `.env.example` (comando en `tests/auth-seguridad/security/forge_token_check.py`). 2. Correr `forge_token_check.py`: firma un token para el id 1 con ese secreto, sin login. 3. Consultar `GET /users/me` y `GET /zones` con ese token. 4. Validar `Settings(app_env="production", jwt_secret=<secreto público>)` |
+| Resultado esperado | El backend no arranca en producción con un secreto conocido, y un token que no emitió el servidor no da acceso (RNF-01, criterios 1 y 6) |
+| Resultado actual | Paso 3: 200 con el perfil y las zonas del usuario 900000001. Paso 4: la configuración se acepta sin error. Con el secreto aleatorio del ambiente QA, el mismo token no da acceso |
+| Evidencia | `reports/manual/def-jwt-secreto-publico.txt`; `test_cp_rnf01_07_produccion_rechaza_secreto_publico` (2 `XFAIL`) y `test_cp_rnf01_07_secreto_por_defecto_permite_fabricar_tokens` en `reports/pytest/auth-seguridad.txt` |
+| Estado | Abierto |
+| Responsable | Ben Farz |
+| Caso de prueba que lo encontró | CP-RNF01-07. Hallazgo 33 |
