@@ -83,6 +83,12 @@ Así se prueba todo el código del pipeline (búsqueda, reglas regulatorias, per
 
 ## Decision Log
 
+### [2026-11-27] Cinco características de ISO/IEC 25010 y RNF-05 dentro de Adecuación funcional
+
+**Contexto:** El enunciado exige al menos 5 de las 9 características, con Adecuación funcional, Seguridad y Mantenibilidad como obligatorias, y una ficha GQM por cada característica seleccionada. Había evidencia encaminada para 8, pero cada característica extra suma una ficha de métricas y una sección de análisis en un plazo de 7 días.
+**Decisión:** Se seleccionan las 3 obligatorias más Eficiencia de desempeño y Fiabilidad, que son las de mayor riesgo para este sistema: el MVP promete 10 a 50 s y ya se midieron 103 s, y ya se observaron recomendaciones atascadas para siempre. Protección, Capacidad de interacción, Flexibilidad y Compatibilidad quedan fuera, cada una con su justificación en `plan-calidad.md`. RNF-05 (productos prohibidos, toxicidad e intervalo de seguridad) se traza a Adecuación funcional, en corrección y pertinencia. La prueba de usabilidad y la revisión WCAG se hacen igual porque son obligatorias.
+**Consecuencias:** Las métricas y el análisis se concentran en 5 características con evidencia sólida. Los defectos de instalación (DEF-A04, DEF-A05) y los de usabilidad se registran igual, pero no se resumen en una métrica de su característica.
+
 ### [2026-11-27] Defectos con ID por persona y escalas comunes de severidad y prioridad
 
 **Contexto:** Tres personas registran defectos en el mismo `docs/defectos.md` durante los mismos días. Con una numeración única (`DEF-01`, `DEF-02`), dos personas tomarían el mismo número y chocarían al hacer merge. Además, sin una escala común, "Alta" significaría cosas distintas para cada quien y el informe no podría comparar defectos.

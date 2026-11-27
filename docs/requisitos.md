@@ -99,7 +99,7 @@ Criterios de aceptación:
 
 ## Requerimientos no funcionales
 
-El mínimo exigido es 3 (uno por integrante). RNF-04 y RNF-05 se agregan para que los escenarios de carga y el análisis de Protección queden trazados a un requerimiento.
+El mínimo exigido es 3 (uno por integrante). RNF-04 y RNF-05 se agregan para que los escenarios de carga y la verificación de lo que se recomienda queden trazados a un requerimiento.
 
 ### RNF-01 Seguridad del acceso y de los datos
 
@@ -142,7 +142,7 @@ El mínimo exigido es 3 (uno por integrante). RNF-04 y RNF-05 se agregan para qu
 
 ### RNF-05 Protección de quien aplica el producto
 
-**Responsable:** Persona C. **Característica 25010:** Protección (advertencia de peligro, identificación de riesgos). **Fuente:** Spec 7 (tabla comparativa con toxicidad e intervalo de seguridad), Spec 6 (validador regulatorio).
+**Responsable:** Persona C. **Característica 25010:** Adecuación funcional (corrección y pertinencia funcional). Protección no es una característica seleccionada (ver `plan-calidad.md`), así que este riesgo se evalúa dentro de Adecuación funcional. **Fuente:** Spec 7 (tabla comparativa con toxicidad e intervalo de seguridad), Spec 6 (validador regulatorio).
 
 1. Cada producto recomendado muestra su banda toxicológica y su intervalo de seguridad.
 2. Ningún producto recomendado está prohibido por las regulaciones cargadas.

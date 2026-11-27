@@ -1,6 +1,6 @@
 # Resultados de las pruebas de carga
 
-Responsable: Persona A. Requerimiento: RNF-04 (y RNF-03, criterio 1). Umbrales declarados antes de correr, en `docs/plan-calidad.md`. Solo contra el ambiente QA local, con el LLM falso y usuarios sintéticos (cédulas que empiezan en 7).
+Responsable: Ben Farz (Persona A). Requerimiento: RNF-04 (y RNF-03, criterio 1). Umbrales declarados antes de correr, en `docs/plan-calidad.md`. Solo contra el ambiente QA local, con el LLM falso y usuarios sintéticos (cédulas que empiezan en 7).
 
 Ejecución: 2026-11-26, k6 1.0.0 en Docker (`run_k6.sh`), en una sola máquina con Docker dentro de WSL. El backend corre un solo proceso de uvicorn, como el `docker-compose.yml` de SynapSeed.
 

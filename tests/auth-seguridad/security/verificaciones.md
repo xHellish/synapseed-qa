@@ -1,6 +1,6 @@
 # Verificaciones de seguridad
 
-Responsable: Persona A. Solo contra el ambiente QA local (`env/docker-compose.qa.yml`), nunca contra Supabase, OpenRouter ni Gemini. Cada verificación usa usuarios sintéticos nuevos (cédulas que empiezan en 8) y está automatizada en `test_security.py`. Su caso de prueba es `CP-RNF01-0N` en `docs/casos-prueba/casos-A.md`.
+Responsable: Ben Farz (Persona A). Solo contra el ambiente QA local (`env/docker-compose.qa.yml`), nunca contra Supabase, OpenRouter ni Gemini. Cada verificación usa usuarios sintéticos nuevos (cédulas que empiezan en 8) y está automatizada en `test_security.py`. Su caso de prueba es `CP-RNF01-0N` en `docs/casos-prueba/casos-A.md`.
 
 Ejecución: 2026-11-26, con `synapseed\src\backend\.venv\Scripts\python -m pytest tests/auth-seguridad -m security`. Resultado: 10 pruebas pasan y 12 confirman defectos (`XFAIL`). Salida completa en `reports/pytest/auth-seguridad.txt` y `.xml`.
 

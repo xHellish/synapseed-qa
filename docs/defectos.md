@@ -1,6 +1,6 @@
 # Registro de defectos
 
-Consolida: Persona C. Cada quien registra los defectos que encuentra en su propia sección, con IDs `DEF-A01`, `DEF-B01` o `DEF-C01` según la persona, para que los números no choquen. La severidad la decide quien prueba; la prioridad es una propuesta para quien decide sobre el producto.
+Consolida: Josué Calderón (Persona C). Cada quien registra los defectos que encuentra en su propia sección, con IDs `DEF-A01`, `DEF-B01` o `DEF-C01` según la persona, para que los números no choquen. La severidad la decide quien prueba; la prioridad es una propuesta para quien decide sobre el producto.
 
 Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del ambiente QA local se reproducen con `env/docker-compose.qa.yml` y datos sintéticos.
 
@@ -23,20 +23,20 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 
 | ID | Título | Severidad | Prioridad | Estado | Caso que lo encontró | Responsable |
 |----|--------|-----------|-----------|--------|----------------------|-------------|
-| DEF-A01 | Restablecimiento de contraseña sin verificación permite tomar cualquier cuenta | Crítica | Alta | Abierto | CP-RNF01-01 (SEC-01) | Persona A |
-| DEF-A02 | Los errores 500 exponen el traceback y rutas internas | Alta | Alta | Abierto | CP-RNF01-05 (SEC-05) | Persona A |
-| DEF-A03 | El login no limita los intentos fallidos | Alta | Alta | Abierto | CP-RNF01-06 (SEC-06) | Persona A |
-| DEF-A04 | Una instalación desde cero falla por enums incompatibles | Alta | Media | Abierto | Construcción del ambiente QA | Persona A |
-| DEF-A05 | El seed no carga productos porque sus CSV no están en el repo | Alta | Media | Abierto | Construcción del ambiente QA | Persona A |
-| DEF-A06 | El bcrypt del login bloquea todo el backend | Alta | Media | Abierto | CP-RNF04-01 (PERF-01) | Persona A |
-| DEF-A07 | Con varias personas, las recomendaciones superan los 50 s documentados | Alta | Media | Abierto | CP-RNF04-02 (PERF-02) | Persona A |
-| DEF-A08 | Zonas no valida la entrada: acepta campos extra y responde 500 a tipos incorrectos | Media | Media | Abierto | CP-RNF01-04 (SEC-04) | Persona A |
-| DEF-A09 | El health check responde "ok" con Redis caído | Media | Media | Abierto | Prueba de humo de la API y verificación con Redis detenido | Persona A |
-| DEF-A10 | El stream de progreso de una recomendación no exige token | Media | Baja | Abierto | CP-RNF01-03 (SEC-03) | Persona A |
-| DEF-A11 | Un token inválido responde 503 con detalles de configuración | Baja | Baja | Abierto | CP-RNF01-02 (SEC-02) | Persona A |
-| DEF-A12 | El registro está definido en dos esquemas con reglas distintas | Baja | Baja | Abierto | CP-RF01-07 | Persona A |
+| DEF-A01 | Restablecimiento de contraseña sin verificación permite tomar cualquier cuenta | Crítica | Alta | Abierto | CP-RNF01-01 (SEC-01) | Ben Farz |
+| DEF-A02 | Los errores 500 exponen el traceback y rutas internas | Alta | Alta | Abierto | CP-RNF01-05 (SEC-05) | Ben Farz |
+| DEF-A03 | El login no limita los intentos fallidos | Alta | Alta | Abierto | CP-RNF01-06 (SEC-06) | Ben Farz |
+| DEF-A04 | Una instalación desde cero falla por enums incompatibles | Alta | Media | Abierto | Construcción del ambiente QA | Ben Farz |
+| DEF-A05 | El seed no carga productos porque sus CSV no están en el repo | Alta | Media | Abierto | Construcción del ambiente QA | Ben Farz |
+| DEF-A06 | El bcrypt del login bloquea todo el backend | Alta | Media | Abierto | CP-RNF04-01 (PERF-01) | Ben Farz |
+| DEF-A07 | Con varias personas, las recomendaciones superan los 50 s documentados | Alta | Media | Abierto | CP-RNF04-02 (PERF-02) | Ben Farz |
+| DEF-A08 | Zonas no valida la entrada: acepta campos extra y responde 500 a tipos incorrectos | Media | Media | Abierto | CP-RNF01-04 (SEC-04) | Ben Farz |
+| DEF-A09 | El health check responde "ok" con Redis caído | Media | Media | Abierto | Prueba de humo de la API y verificación con Redis detenido | Ben Farz |
+| DEF-A10 | El stream de progreso de una recomendación no exige token | Media | Baja | Abierto | CP-RNF01-03 (SEC-03) | Ben Farz |
+| DEF-A11 | Un token inválido responde 503 con detalles de configuración | Baja | Baja | Abierto | CP-RNF01-02 (SEC-02) | Ben Farz |
+| DEF-A12 | El registro está definido en dos esquemas con reglas distintas | Baja | Baja | Abierto | CP-RF01-07 | Ben Farz |
 
-## Defectos de la Persona A
+## Defectos de Ben Farz (Persona A)
 
 ### DEF-A01
 
@@ -52,7 +52,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Resultado actual | El paso 3 responde 204, el paso 4 entrega un token y el paso 5 responde 401: la cuenta queda en manos del atacante |
 | Evidencia | `test_cp_rnf01_01_reset_sin_verificacion_no_toma_la_cuenta` en `reports/pytest/auth-seguridad.txt`; `tests/auth-seguridad/security/verificaciones.md` |
 | Estado | Abierto |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RNF01-01 (SEC-01). Hallazgo 27 |
 
 ### DEF-A02
@@ -69,7 +69,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Resultado actual | 500 con `Traceback (most recent call last)`, rutas como `/usr/local/lib/python3.12/site-packages/starlette/...` y el código que falló |
 | Evidencia | `test_cp_rnf01_05_error_500_sin_traceback` en `reports/pytest/auth-seguridad.txt` |
 | Estado | Abierto |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RNF01-05 (SEC-05). Hallazgo 14 |
 
 ### DEF-A03
@@ -86,7 +86,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Resultado actual | Los 30 intentos responden 401, a unos 4 por segundo, y luego la contraseña correcta funciona sin restricción |
 | Evidencia | `test_cp_rnf01_06_login_limita_intentos_fallidos` en `reports/pytest/auth-seguridad.txt` |
 | Estado | Abierto |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RNF01-06 (SEC-06). Hallazgo 30 |
 
 ### DEF-A04
@@ -103,7 +103,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Resultado actual | El paso 3 devuelve `{decreto,ley,...}`; el paso 4 falla con `invalid input value for enum regulationtype: "DECRETO"`, el mismo error del seed |
 | Evidencia | `reports/manual/def-enums-migraciones.txt`; contorno en `env/align_enums.py` |
 | Estado | Abierto |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 | Caso de prueba que lo encontró | Construcción del ambiente QA local (2026-11-26). Hallazgo 26 |
 
 ### DEF-A05
@@ -120,7 +120,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Resultado actual | No existe `output/`, hay 0 archivos `.csv` versionados y el seed termina "exitosamente" con 0 productos |
 | Evidencia | `reports/manual/def-seed-sin-csv.txt`; contorno en `env/seed_synthetic.py` |
 | Estado | Abierto |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 | Caso de prueba que lo encontró | Construcción del ambiente QA local (2026-11-26). Hallazgo 25 |
 
 ### DEF-A06
@@ -137,7 +137,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Resultado actual | El catálogo pasa de una mediana de 10.4 ms a 2403 ms durante 10 logins, casi 10 x 250 ms. En PERF-01, con 20 usuarios, p95 del login de 5120 ms y de lecturas de 2060 ms |
 | Evidencia | `reports/k6/perf-01-diagnostico.txt`, `reports/k6/perf-01.txt`, `tests/auth-seguridad/performance/resultados.md` |
 | Estado | Abierto |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RNF04-01 (PERF-01). Hallazgo 31 |
 
 ### DEF-A07
@@ -154,7 +154,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Resultado actual | Una recomendación sola tarda 11 s, pero el p95 es de 94 s y la última llega a los 95 s. Con el LLM real (103 s medidos, hallazgo 21) la décima persona esperaría más de 15 minutos |
 | Evidencia | `reports/k6/perf-02-delay-3000.txt` y `.json`; `tests/auth-seguridad/performance/resultados.md` |
 | Estado | Abierto |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RNF04-02 (PERF-02). Hallazgo 32 |
 
 ### DEF-A08
@@ -171,7 +171,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Resultado actual | Paso 2: 201. Pasos 3 y 4: 500 con traceback |
 | Evidencia | `test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza` en `reports/pytest/auth-seguridad.txt` |
 | Estado | Abierto |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RNF01-04 (SEC-04). Hallazgo 15 |
 
 ### DEF-A09
@@ -188,7 +188,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Resultado actual | El health responde 200 con `"status": "ok"` y `"redis": "pending"` antes, durante y después de la caída, mientras la solicitud de recomendación responde 500 con traceback |
 | Evidencia | `reports/manual/def-health-sin-redis.txt` |
 | Estado | Abierto |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 | Caso de prueba que lo encontró | Prueba de humo de la API (2026-11-24) y verificación con Redis detenido (2026-11-27). Hallazgo 20 |
 
 ### DEF-A10
@@ -205,7 +205,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Resultado actual | 200 con el evento `status` de la recomendación |
 | Evidencia | `test_cp_rnf01_03_stream_de_progreso_exige_token` en `reports/pytest/auth-seguridad.txt` |
 | Estado | Abierto |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RNF01-03 (SEC-03). Hallazgo 28 |
 
 ### DEF-A11
@@ -222,7 +222,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Resultado actual | 503 "SUPABASE_URL y SUPABASE_ANON_KEY deben estar configurados" en los 5 tipos de token |
 | Evidencia | `test_cp_rnf01_02_token_manipulado_responde_401` en `reports/pytest/auth-seguridad.txt` |
 | Estado | Abierto |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RNF01-02 (SEC-02). Hallazgo 29 |
 
 ### DEF-A12
@@ -239,5 +239,5 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Resultado actual | Los 4 valores se aceptan en `RegisterRequest` y se rechazan en `UserRegister` |
 | Evidencia | `test_cp_rf01_07_esquemas_de_registro_consistentes` (4 `XFAIL`) en `reports/pytest/auth-seguridad.txt` |
 | Estado | Abierto |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RF01-07. Hallazgo 17 |

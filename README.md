@@ -125,13 +125,13 @@ Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Cal
 
 ## Organización del trabajo
 
-Las pruebas están separadas por área funcional; cada área tiene un dueño, que solo hace commit dentro de su carpeta.
+Las pruebas están separadas por área funcional; cada área tiene un dueño, que solo hace commit dentro de su carpeta. En la columna Responsable de casos, defectos y matriz va el nombre de cada integrante, que es la base de la nota individual.
 
 | Área | Responsable | Requerimientos | Subcarpetas |
 |------|-------------|----------------|-------------|
-| `tests/auth-seguridad/` | Persona A | RF-01, RF-02, RNF-01, RNF-04 | `unit`, `integration`, `e2e`, `api`, `security`, `performance` |
-| `tests/zonas-catalogos/` | Persona B | RF-03, RF-04, RNF-02 | `unit`, `integration`, `e2e`, `api` |
-| `tests/recomendacion/` | Persona C | RF-05, RF-06, RNF-03, RNF-05 | `unit`, `integration`, `e2e`, `api` |
+| `tests/auth-seguridad/` | Persona A: Ben Farz | RF-01, RF-02, RNF-01, RNF-04 | `unit`, `integration`, `e2e`, `api`, `security`, `performance` |
+| `tests/zonas-catalogos/` | Persona B: Kevin Alanis | RF-03, RF-04, RNF-02 | `unit`, `integration`, `e2e`, `api` |
+| `tests/recomendacion/` | Persona C: Josué Calderón | RF-05, RF-06, RNF-03, RNF-05 | `unit`, `integration`, `e2e`, `api` |
 
 Convenciones:
 

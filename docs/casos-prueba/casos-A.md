@@ -1,4 +1,4 @@
-# Casos de prueba - Persona A
+# Casos de prueba - Ben Farz (Persona A)
 
 Cada requerimiento lleva casos de camino feliz, negativos o de error, y de frontera o no funcionales. El resultado esperado se escribe antes de ejecutar. ID: `CP-RFxx-nn` o `CP-RNFxx-nn`. Si el caso está automatizado, el nombre de la prueba empieza con el ID (por ejemplo `test_cp_rf01_01_...`).
 
@@ -51,7 +51,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 201 con el perfil; ningún campo sensible en la respuesta |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RF01-02
 
@@ -71,7 +71,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 409, "La cédula ya está registrada" |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RF01-03
 
@@ -91,7 +91,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | Los 7 valores se comportan como se esperaba; la API responde 422 y el detalle nombra `identification` |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RF01-04
 
@@ -111,7 +111,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | Las 5 se rechazan; la API responde 422 |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RF01-05
 
@@ -131,7 +131,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | Hash con prefijo `$2b$` |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RF01-06
 
@@ -151,7 +151,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | Rechazo en los 5 casos; la API responde 422 |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RF01-07
 
@@ -171,7 +171,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | Los 4 valores se aceptan en `app/schemas/auth.py` (`RegisterRequest`: cédula de 5 o más, contraseña de 6 o más) y se rechazan en `app/schemas/user.py` (`UserRegister`: cédula de 9 a 12 dígitos, contraseña de 8 o más). El router usa `UserRegister`, así que hoy rige la regla más estricta, pero la duplicación deja dos fuentes de verdad |
 | Estado | Falla; confirma el hallazgo 17 (DEF-A12) |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (4 `XFAIL`) |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RF02-01
 
@@ -191,7 +191,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 200 con JWT de 3 segmentos y usuario sin campos sensibles |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RF02-02
 
@@ -211,7 +211,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 86400 en ambos |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RF02-03
 
@@ -231,7 +231,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 401 en ambos, "Cédula o contraseña incorrectos" |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RF02-04
 
@@ -251,7 +251,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 422 sin token |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RF02-05
 
@@ -271,7 +271,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 200 con el perfil propio; 401 sin token |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RNF01-01
 
@@ -291,7 +291,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 204: la contraseña cambia y el atacante inicia sesión; la original deja de funcionar. Con datos erróneos, 400 con el mismo mensaje en ambos casos |
 | Estado | Falla; confirma el hallazgo 27 (DEF-A01) |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RNF01-02
 
@@ -311,7 +311,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | Ningún token da acceso, pero los 5 responden 503 "SUPABASE_URL y SUPABASE_ANON_KEY deben estar configurados" |
 | Estado | Pasa en el acceso; falla en la respuesta (DEF-A11, hallazgo 29) |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RNF01-03
 
@@ -331,7 +331,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | Zonas y recomendaciones protegidas como se esperaba. El stream responde 200 sin token con el estado de la recomendación |
 | Estado | Pasa en zonas y recomendaciones; falla en el stream (DEF-A10, hallazgo 28) |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RNF01-04
 
@@ -351,7 +351,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | El `user_id` se ignora. Campo desconocido: 201. Nombre numérico y latitud de texto: 500 con traceback. El frontend no usa `dangerouslySetInnerHTML` ni `innerHTML` |
 | Estado | Falla en la validación (DEF-A08, hallazgo 15); pasa en asignación y escape |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RNF01-05
 
@@ -371,7 +371,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 500 con el traceback completo de Python y rutas del servidor |
 | Estado | Falla; confirma el hallazgo 14 (DEF-A02) |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RNF01-06
 
@@ -391,7 +391,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | Los 30 intentos responden 401, unos 4 por segundo; después la contraseña correcta sigue funcionando |
 | Estado | Falla; nuevo hallazgo 30 (DEF-A03) |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RNF04-01
 
@@ -411,7 +411,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 0% de fallos y 100% de verificaciones, pero p95 del login de 5120 ms y p95 de lecturas de 2060 ms. El diagnóstico muestra que una lectura pasa de 10 ms a 2403 ms durante 10 logins simultáneos |
 | Estado | Falla (2 de 4 umbrales); nuevo hallazgo 31 (DEF-A06) |
 | Evidencia | `reports/k6/perf-01.txt`, `reports/k6/perf-01.json`, `reports/k6/perf-01-diagnostico.txt` |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
 
 ## CP-RNF04-02
 
@@ -431,4 +431,4 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | Sin latencia: 837 ms, 5.6 s y 100%, cumple los tres. Con 3 s por llamada: 704 ms y 100%, pero p95 de solicitud a resultado de 94 s (una sola tarda 11 s; las demás esperan en cola) |
 | Estado | Pasa sin latencia; falla con latencia (1 de 3 umbrales); nuevo hallazgo 32 (DEF-A07) |
 | Evidencia | `reports/k6/perf-02-delay-0.txt` y `.json`, `reports/k6/perf-02-delay-3000.txt` y `.json` |
-| Responsable | Persona A |
+| Responsable | Ben Farz |
