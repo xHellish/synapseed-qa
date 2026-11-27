@@ -123,6 +123,14 @@ Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Cal
    bash tests/auth-seguridad/performance/run_k6.sh recommendation_load.js perf-02-rampa-delay-0
    ```
 
+   Las colecciones de Postman se corren con Postman CLI desde la raíz, con el ambiente QA arriba; no hace falta iniciar sesión para correrlas localmente:
+
+   ```bash
+   postman collection run tests/auth-seguridad/api/auth-seguridad.postman_collection.json > reports/postman/auth-seguridad.txt
+   ```
+
+   Si una aserción falla, el comando termina con código 1; las que confirman un defecto conocido llevan su ID en el nombre (por ejemplo `DEF-A01: ...`).
+
    El escaneo pasivo de OWASP ZAP se corre igual, desde WSL; el script solo acepta URLs del ambiente QA local y deja los reportes en `reports/zap/`:
 
    ```bash

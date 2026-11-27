@@ -28,10 +28,13 @@ Los resultados esperados salen de los criterios de aceptación de `docs/requisit
 | CP-RNF01-06 (SEC-06) | Fuerza bruta en el login | RNF-01 (8) | Prueba de ataque: 30 intentos seguidos | Seguridad | Falla (DEF-A03, hallazgo 30) |
 | CP-RNF01-07 | Secreto JWT público | RNF-01 (1, 6) | Prueba de ataque: token fabricado con un secreto conocido | Unitaria y seguridad | Falla (DEF-A13, hallazgo 33) |
 | CP-RNF01-08 (SEC-08) | Escaneo pasivo con OWASP ZAP | RNF-01 (5, 7) | Análisis automatizado de configuración | Seguridad | Falla (DEF-A14, A15, A16; hallazgos 34 a 36) |
+| CP-RNF01-09 (SEC-09) | Enumeración de cuentas por tiempo del login | RNF-01 (1) | Comparación de tiempos con muestras alternadas | Seguridad | Falla (DEF-A17, hallazgo 37) |
 | CP-RNF04-01 (PERF-01) | Carga de autenticación y lectura | RNF-04 (3) | Prueba de carga con umbrales previos | Rendimiento | Falla (DEF-A06, hallazgo 31) |
 | CP-RNF04-02 (PERF-02) | Recomendaciones simultáneas | RNF-04 (1, 2), RNF-03 (1) | Prueba de carga con umbrales previos | Rendimiento | Pasa sin latencia; falla con latencia (DEF-A07, hallazgo 32) |
 
 Ejecución: 2026-11-26 contra el ambiente QA local (`env/docker-compose.qa.yml`), con `synapseed\src\backend\.venv\Scripts\python -m pytest tests/auth-seguridad`. Última corrida completa: 2026-11-27. Resultado: 47 pruebas pasan y 18 fallan como se esperaba (`xfail`): 4 de DEF-A12, 2 de DEF-A13 y 12 de las verificaciones de seguridad. La cobertura de las pruebas unitarias está en `reports/coverage/auth-seguridad-unit.txt` y `.xml`: 100% de `app/schemas/auth.py`, 91% de `app/schemas/user.py` y 70% de `app/core/security.py`; lo que falta de este último (`get_current_user`) necesita base de datos y lo cubren las pruebas de integración. El detalle de los ataques está en `tests/auth-seguridad/security/verificaciones.md`. Los escenarios de carga se corren con k6 (`tests/auth-seguridad/performance/run_k6.sh`) y sus resultados están en `tests/auth-seguridad/performance/resultados.md`. La salida completa de cada corrida queda en `reports/`.
+
+Los casos de RF-01, RF-02 y los defectos DEF-A01 y DEF-A11 también se verifican por la API con Postman (`tests/auth-seguridad/api/auth-seguridad.postman_collection.json`): cada request lleva el ID de su caso. Corrida del 2026-11-27: 13 requests y 23 aserciones, 21 pasan y 2 fallan, que son justo las de DEF-A01 y DEF-A11. Salida en `reports/postman/auth-seguridad.txt`.
 
 Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(strict=True, reason="Hallazgo N ...")`: la suite queda en verde, el defecto queda visible en el reporte como `XFAIL` y, si alguien lo corrige, la prueba pasa a `XPASS` y la suite falla para que se quite la marca.
 
@@ -230,7 +233,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Datos de prueba | Cédula existente con contraseña incorrecta; cédula sintética inexistente |
 | Pasos, o nombre de la prueba automatizada | `test_cp_rf02_03_mismo_rechazo_para_contrasena_y_cedula` |
 | Resultado esperado | Ambos rechazados (la API define 401) con el mismo mensaje |
-| Resultado obtenido | 401 en ambos, "Cédula o contraseña incorrectos" |
+| Resultado obtenido | 401 en ambos, "Cédula o contraseña incorrectos". El mensaje no revela la cuenta, pero el tiempo sí: ver CP-RNF01-09 |
 | Estado | Pasa |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Ben Farz |
@@ -433,6 +436,26 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | 0 alertas de riesgo alto. Riesgo medio: falta CSP y protección contra clickjacking en ambas, y `/docs` carga scripts sin SRI. La imagen de producción tampoco envía cabeceras y responde 502 a todas las llamadas a la API |
 | Estado | Falla; nuevos hallazgos 34, 35 y 36 (DEF-A14, DEF-A15, DEF-A16) |
 | Evidencia | `reports/zap/zap-frontend.*`, `reports/zap/zap-api.*`, `reports/manual/def-frontend-prod-sin-api.txt`; análisis en `tests/auth-seguridad/security/verificaciones.md` |
+| Responsable | Ben Farz |
+
+## CP-RNF01-09
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RNF01-09 |
+| Nombre | Enumeración de cuentas por tiempo del login (SEC-09) |
+| Objetivo | Verificar que el login no revela si una cédula está registrada, ni por el mensaje ni por el tiempo de respuesta |
+| Requerimiento asociado | RNF-01, criterio 1; complementa RF-02, criterio 3 |
+| Tipo y nivel de prueba | Seguridad, sistema (API del ambiente QA local) |
+| Prioridad | Media |
+| Característica 25010 que evidencia | Seguridad (confidencialidad) |
+| Precondiciones | Ambiente QA local arriba; usuario sintético 900000001 del seed |
+| Datos de prueba | Cédula registrada 900000001 y cédula inexistente 500000000, ambas con la misma contraseña incorrecta; 20 intentos de cada una, alternados |
+| Pasos, o nombre de la prueba automatizada | `tests/auth-seguridad/security/login_timing_check.py` |
+| Resultado esperado | Mismo código, mismo mensaje y tiempos que se superponen, de modo que no se pueda distinguir una cédula registrada |
+| Resultado obtenido | Mismo código (401) y mismo cuerpo, pero la cédula registrada tarda de 234 a 339 ms (mediana 244 ms) y la inexistente de 8 a 28 ms (mediana 10 ms): los rangos no se tocan, así que un solo intento basta para saber si la cédula tiene cuenta |
+| Estado | Falla; nuevo hallazgo 37 (DEF-A17) |
+| Evidencia | `reports/manual/def-login-enumeracion-tiempo.txt` |
 | Responsable | Ben Farz |
 
 ## CP-RNF04-01

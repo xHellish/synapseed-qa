@@ -107,6 +107,12 @@ Encontrados el 2026-11-27 con `zap-baseline.py` (escaneo pasivo) contra el ambie
 35. **Ni el frontend ni la API envían cabeceras de seguridad.** Faltan `Content-Security-Policy`, `X-Frame-Options` (o `frame-ancestors`), `X-Content-Type-Options`, `Permissions-Policy` y las cabeceras `Cross-Origin-*`. Ocurre en el servidor de desarrollo, en el nginx de producción (que solo envía `Server: nginx/1.27.5`) y en las respuestas JSON de FastAPI, que no tiene ningún middleware de cabeceras. ZAP las marca como riesgo medio (CSP y clickjacking) y bajo (el resto).
 36. **La documentación de la API está expuesta en cualquier ambiente y carga scripts de un CDN sin SRI.** `app/main.py` publica `/docs`, `/redoc` y `/openapi.json` sin condición de ambiente, así que también quedarían abiertos en producción. Swagger UI carga JavaScript y CSS de `cdn.jsdelivr.net` sin atributo `integrity`: si el CDN entrega un archivo alterado, se ejecuta en el origen de la API.
 
+## Hallazgos de las pruebas de API con Postman
+
+Encontrado el 2026-11-27 al revisar los tiempos de la corrida de Postman y confirmado con 20 muestras.
+
+37. **El tiempo de respuesta del login revela qué cédulas están registradas.** El login responde con el mismo 401 y el mismo mensaje para una contraseña incorrecta y para una cédula inexistente, pero `authenticate_user` solo calcula bcrypt cuando la cédula existe. Con 20 intentos alternados, la cédula registrada tardó de 234 a 339 ms y la inexistente de 8 a 28 ms, sin superposición. Evidencia: `reports/manual/def-login-enumeracion-tiempo.txt`.
+
 ## Hallazgos formalizados como defectos
 
 Los hallazgos se formalizan en `docs/defectos.md`, con severidad, prioridad, pasos para reproducir y evidencia. Hallazgos de la Persona A:
@@ -120,6 +126,7 @@ Los hallazgos se formalizan en `docs/defectos.md`, con severidad, prioridad, pas
 | 34 | DEF-A14 | Alta |
 | 35 | DEF-A15 | Media |
 | 36 | DEF-A16 | Baja |
+| 37 | DEF-A17 | Media |
 | 26 | DEF-A04 | Alta |
 | 25 | DEF-A05 | Alta |
 | 31 | DEF-A06 | Alta |

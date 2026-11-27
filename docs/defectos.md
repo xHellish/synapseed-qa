@@ -34,6 +34,7 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | DEF-A07 | Con varias personas, las recomendaciones superan los 50 s documentados | Alta | Media | Abierto | CP-RNF04-02 (PERF-02) | Ben Farz |
 | DEF-A08 | Zonas no valida la entrada: acepta campos extra y responde 500 a tipos incorrectos | Media | Media | Abierto | CP-RNF01-04 (SEC-04) | Ben Farz |
 | DEF-A15 | Ni el frontend ni la API envían cabeceras de seguridad | Media | Media | Abierto | CP-RNF01-08 (SEC-08) | Ben Farz |
+| DEF-A17 | El tiempo de respuesta del login revela qué cédulas están registradas | Media | Media | Abierto | CP-RNF01-09 (SEC-09) | Ben Farz |
 | DEF-A09 | El health check responde "ok" con Redis caído | Media | Media | Abierto | Prueba de humo de la API y verificación con Redis detenido | Ben Farz |
 | DEF-A10 | El stream de progreso de una recomendación no exige token | Media | Baja | Abierto | CP-RNF01-03 (SEC-03) | Ben Farz |
 | DEF-A11 | Un token inválido responde 503 con detalles de configuración | Baja | Baja | Abierto | CP-RNF01-02 (SEC-02) | Ben Farz |
@@ -313,3 +314,20 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Estado | Abierto |
 | Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RNF01-08 (SEC-08). Hallazgo 36 |
+
+### DEF-A17
+
+| Campo | Valor |
+|-------|-------|
+| Título | El tiempo de respuesta del login revela qué cédulas están registradas |
+| Descripción | El login responde igual (401, "Cédula o contraseña incorrectos") ante una contraseña incorrecta y ante una cédula inexistente, pero `authenticate_user` responde de inmediato cuando la cédula no existe y solo calcula bcrypt cuando existe. La diferencia de tiempo, de más de 200 ms, permite saber si una cédula tiene cuenta. Combinado con DEF-A03 (sin límite de intentos) y DEF-A01 (reset con cédula y correo), facilita elegir víctimas |
+| Característica 25010 | Seguridad (confidencialidad) |
+| Severidad | Media |
+| Prioridad | Media |
+| Pasos para reproducir | 1. Con el ambiente QA arriba, correr `tests/auth-seguridad/security/login_timing_check.py`. 2. Comparar los tiempos de la cédula registrada 900000001 y de la inexistente 500000000, ambas con contraseña incorrecta |
+| Resultado esperado | Tiempos que se superponen, por ejemplo calculando un hash de relleno cuando la cédula no existe (RNF-01, criterio 1; complementa RF-02, criterio 3) |
+| Resultado actual | Cédula registrada: de 234 a 339 ms (mediana 244 ms). Cédula inexistente: de 8 a 28 ms (mediana 10 ms). Mismo código y mismo cuerpo |
+| Evidencia | `reports/manual/def-login-enumeracion-tiempo.txt`; también visible en `reports/postman/auth-seguridad.txt` (252 ms contra 15 ms) |
+| Estado | Abierto |
+| Responsable | Ben Farz |
+| Caso de prueba que lo encontró | CP-RNF01-09 (SEC-09), a partir de la corrida de Postman. Hallazgo 37 |

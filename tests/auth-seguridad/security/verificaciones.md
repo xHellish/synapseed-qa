@@ -19,6 +19,7 @@ Verificaciones adicionales, fuera de las 6 mínimas:
 |----|--------------|------|----------------------|-----------|
 | SEC-07 | Nadie fabrica tokens válidos con un secreto JWT conocido | Autenticación y configuración (OWASP A02, A05, A07) | `unit/test_security_helpers.py` (`test_cp_rnf01_07_*`) y `security/forge_token_check.py` | **Falla.** El backend arranca en producción con el secreto por defecto o el de `.env.example`, y con ese secreto un token fabricado sin login dio acceso al perfil y a las zonas del usuario 900000001 (hallazgo 33, DEF-A13). Evidencia: `reports/manual/def-jwt-secreto-publico.txt` |
 | SEC-08 | Escaneo pasivo de cabeceras y configuración con OWASP ZAP | Configuración de seguridad (OWASP A05) | `security/run_zap.sh` (ZAP 2.17.0, `zap-baseline.py`) | **Falla en parte.** 0 alertas de riesgo alto y 16 advertencias. Faltan las cabeceras de seguridad en el frontend y en la API (hallazgo 35, DEF-A15), y `/docs` carga scripts de un CDN sin SRI en cualquier ambiente (hallazgo 36, DEF-A16). Al revisar si las alertas del frontend eran propias del modo desarrollo, se encontró que la imagen de producción no llega a la API (hallazgo 34, DEF-A14). Evidencia: `reports/zap/` y `reports/manual/def-frontend-prod-sin-api.txt` |
+| SEC-09 | El login no revela por el tiempo de respuesta si una cédula está registrada | Autenticación (OWASP A07) | `security/login_timing_check.py` | **Falla.** Mismo 401 y mismo mensaje, pero una cédula registrada tarda de 234 a 339 ms y una inexistente de 8 a 28 ms, sin superposición: un solo intento revela si la cédula tiene cuenta (hallazgo 37, DEF-A17). Se notó en la corrida de Postman. Evidencia: `reports/manual/def-login-enumeracion-tiempo.txt` |
 
 ## Detalle de los ataques
 
@@ -80,3 +81,6 @@ Las rutas `/@vite/client` y `/src/main.tsx` que aparecen en el reporte de la int
 
 **Limitación.** El spider sin sesión no recorre las pantallas protegidas ni los endpoints autenticados, y el escaneo pasivo no prueba inyecciones. Eso se cubre con las verificaciones dirigidas SEC-01 a SEC-07.
 
+### SEC-09 Enumeración de cuentas por tiempo
+
+La corrida de Postman mostró 252 ms para una contraseña incorrecta y 15 ms para una cédula inexistente. Para descartar el azar se repitió 20 veces cada caso, alternándolos. `authenticate_user` busca la cédula y, si no existe, responde de inmediato; si existe, calcula bcrypt antes de responder. El mensaje igual (CP-RF02-03) no alcanza si el tiempo delata la cuenta. Combinado con DEF-A03 (sin límite de intentos), permite recorrer cédulas y saber cuáles tienen cuenta antes de intentar DEF-A01.

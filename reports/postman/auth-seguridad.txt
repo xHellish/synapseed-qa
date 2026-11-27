@@ -1,0 +1,122 @@
+No authorization data found. Please use the `postman login` command.
+Refer:https://learning.postman.com/docs/postman-cli/postman-cli-options/#postman-login
+
+Running your collection...
+postman
+
+SynapSeed QA - Auth y seguridad
+
+Root CP-RF01-01 Registro valido
+
+  POST http://127.0.0.1:8000/api/v1/auth/register [201 Created, 394 B, 294 ms]
+  Pass  responde 201
+  Pass  devuelve la cedula registrada
+  Pass  no expone la contrasena ni su hash
+
+Root CP-RF01-02 Registro con cedula duplicada
+
+  POST http://127.0.0.1:8000/api/v1/auth/register [409 Conflict, 174 B, 12 ms]
+  Pass  responde 409
+  Pass  el mensaje menciona la cedula
+
+Root CP-RF01-03 Registro con cedula de 8 digitos
+
+  POST http://127.0.0.1:8000/api/v1/auth/register [422 Unprocessable Entity, 307 B, 6 ms]
+  Pass  responde 422
+  Pass  el error senala el campo identification
+
+Root CP-RF01-04 Registro con correo invalido
+
+  POST http://127.0.0.1:8000/api/v1/auth/register [422 Unprocessable Entity, 310 B, 6 ms]
+  Pass  responde 422
+
+Root CP-RF01-06 Registro sin telefono
+
+  POST http://127.0.0.1:8000/api/v1/auth/register [422 Unprocessable Entity, 378 B, 4 ms]
+  Pass  responde 422
+
+Root CP-RF02-01 Login valido
+
+  POST http://127.0.0.1:8000/api/v1/auth/login [200 OK, 620 B, 251 ms]
+  Pass  responde 200
+  Pass  entrega un JWT bearer
+  Pass  el JWT expira en 24 horas
+
+Root CP-RF02-03 Login con contrasena incorrecta
+
+  POST http://127.0.0.1:8000/api/v1/auth/login [401 Unauthorized, 181 B, 252 ms]
+  Pass  responde 401
+
+Root CP-RF02-03 Login con cedula inexistente
+
+  POST http://127.0.0.1:8000/api/v1/auth/login [401 Unauthorized, 181 B, 15 ms]
+  Pass  responde 401
+  Pass  mismo mensaje que con contrasena incorrecta
+
+Root CP-RF02-04 Login con correo en vez de cedula
+
+  POST http://127.0.0.1:8000/api/v1/auth/login [422 Unprocessable Entity, 331 B, 8 ms]
+  Pass  no autentica (401 o 422)
+
+Root CP-RF02-05 Perfil propio con token
+
+  GET http://127.0.0.1:8000/api/v1/users/me [200 OK, 389 B, 21 ms]
+  Pass  responde 200
+  Pass  es el perfil de la persona autenticada
+  Pass  no expone la contrasena ni su hash
+
+Root CP-RF02-05 Perfil sin token
+
+  GET http://127.0.0.1:8000/api/v1/users/me [401 Unauthorized, 217 B, 6 ms]
+  Pass  responde 401
+
+Root CP-RNF01-02 Perfil con token alterado (DEF-A11)
+
+  GET http://127.0.0.1:8000/api/v1/users/me [503 Service Unavailable, 238 B, 24 ms]
+  Pass  el token alterado no da acceso
+  1. DEF-A11: responde 401 sin detalles de configuracion
+
+Root CP-RNF01-01 Reset de contrasena sin verificacion (DEF-A01)
+
+  POST http://127.0.0.1:8000/api/v1/auth/reset-password [204 No Content, 81 B, 321 ms]
+  2. DEF-A01: el reset sin prueba de control de la cuenta se rechaza
+
+-----------------------------------------------------------------------
+|                         |            executed |              failed |
+--------------------------+---------------------+----------------------
+|              iterations |                   1 |                   0 |
+--------------------------+---------------------+----------------------
+|                requests |                  13 |                   0 |
+--------------------------+---------------------+----------------------
+|            test-scripts |                  13 |                   0 |
+--------------------------+---------------------+----------------------
+|      prerequest-scripts |                   2 |                   0 |
+--------------------------+---------------------+----------------------
+|              assertions |                  23 |                   2 |
+-----------------------------------------------------------------------
+| total run duration: 2.1 s                                           |
+-----------------------------------------------------------------------
+| total data received: 1.98 KB (approx)                               |
+-----------------------------------------------------------------------
+| average response time: 93 ms [min: 4 ms, max: 321 ms, s.d.: 124 ms] |
+-----------------------------------------------------------------------
+
+  #  failure         detail                                                              
+                                                                                         
+ 1.  AssertionError  DEF-A11: responde 401 sin detalles de configuracion                 
+                     expected response to have status code 401 but got 503               
+                     at assertion:1 in test-script                                       
+                     inside "CP-RNF01-02 Perfil con token alterado (DEF-A11)"            
+                                                                                         
+ 2.  AssertionError  DEF-A01: el reset sin prueba de control de la cuenta se rechaza     
+                     expected 204 to not deeply equal 204                                
+                     at assertion:0 in test-script                                       
+                     inside "CP-RNF01-01 Reset de contrasena sin verificacion (DEF-A01)" 
+Postman credentials are required for publishing run details to Postman cloud.
+Please specify it by using the `postman login` command
+
+A new version of Postman CLI is available (v1.95.0). Refer https://go.pstmn.io/cli-release-notes for changelogs.
+To update your Postman CLI, run:
+
+postman update
+

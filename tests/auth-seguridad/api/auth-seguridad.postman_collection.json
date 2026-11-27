@@ -1,10 +1,616 @@
 {
   "info": {
     "name": "SynapSeed QA - Auth y seguridad",
+    "description": "Pruebas de API de RF-01, RF-02 y RNF-01 contra el ambiente QA local. Responsable: Ben Farz (Persona A). Cada request lleva el ID de su caso de prueba (docs/casos-prueba/casos-A.md). Usa una cedula sintetica nueva en cada corrida. Las pruebas marcadas con DEF-A01 y DEF-A11 fallan mientras esos defectos sigan abiertos.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "base_url", "value": "http://localhost:8000/api/v1" }
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000/api/v1"
+    },
+    {
+      "key": "identification",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "tampered_token",
+      "value": ""
+    },
+    {
+      "key": "wrong_password_detail",
+      "value": ""
+    }
   ],
-  "item": []
+  "item": [
+    {
+      "name": "CP-RF01-01 Registro valido",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Genera una cedula sintetica de 9 digitos que empieza en 6 (las de pytest empiezan en 8 y las de k6 en 7)",
+              "let identification = \"6\";",
+              "for (let position = 0; position < 8; position++) {",
+              "  identification = identification + String(Math.floor(Math.random() * 10));",
+              "}",
+              "pm.collectionVariables.set(\"identification\", identification);",
+              "pm.collectionVariables.set(\"email\", \"qa.postman.\" + identification + \"@example.com\");",
+              "pm.collectionVariables.set(\"password\", \"QaPostman-\" + identification);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"responde 201\", function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "pm.test(\"devuelve la cedula registrada\", function () {",
+              "  pm.expect(pm.response.json().identification).to.eql(pm.collectionVariables.get(\"identification\"));",
+              "});",
+              "// El perfil nunca debe exponer la contrasena ni su hash",
+              "pm.test(\"no expone la contrasena ni su hash\", function () {",
+              "  const profile = pm.response.json();",
+              "  for (const field of [\"password\", \"password_hash\", \"hashed_password\"]) {",
+              "    pm.expect(profile).to.not.have.property(field);",
+              "  }",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/register",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        },
+        "description": "RF-01, criterio 1. Registro con datos validos y sinteticos.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"full_name\": \"Persona Postman {{identification}}\",\n  \"identification\": \"{{identification}}\",\n  \"phone\": \"88880000\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "CP-RF01-02 Registro con cedula duplicada",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"responde 409\", function () {",
+              "  pm.response.to.have.status(409);",
+              "});",
+              "pm.test(\"el mensaje menciona la cedula\", function () {",
+              "  pm.expect(pm.response.json().detail.toLowerCase()).to.include(\"cédula\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/register",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        },
+        "description": "RF-01, criterio 2. Segundo registro con la misma cedula.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"otra.{{email}}\",\n  \"full_name\": \"Persona Duplicada\",\n  \"identification\": \"{{identification}}\",\n  \"phone\": \"88880000\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "CP-RF01-03 Registro con cedula de 8 digitos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"responde 422\", function () {",
+              "  pm.response.to.have.status(422);",
+              "});",
+              "pm.test(\"el error senala el campo identification\", function () {",
+              "  pm.expect(pm.response.text()).to.include(\"identification\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/register",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        },
+        "description": "RF-01, criterio 3. Valor limite inferior invalido de la cedula.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"ocho.{{email}}\",\n  \"full_name\": \"Persona Cedula Corta\",\n  \"identification\": \"61234567\",\n  \"phone\": \"88880000\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "CP-RF01-04 Registro con correo invalido",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"responde 422\", function () {",
+              "  pm.response.to.have.status(422);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/register",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        },
+        "description": "RF-01, criterio 4.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"qa-sin-arroba.example.com\",\n  \"full_name\": \"Persona Correo Invalido\",\n  \"identification\": \"{{identification}}\",\n  \"phone\": \"88880000\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "CP-RF01-06 Registro sin telefono",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"responde 422\", function () {",
+              "  pm.response.to.have.status(422);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/register",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "register"
+          ]
+        },
+        "description": "RF-01, criterio 6. Campo obligatorio ausente.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"sintel.{{email}}\",\n  \"full_name\": \"Persona Sin Telefono\",\n  \"identification\": \"{{identification}}\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "CP-RF02-01 Login valido",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"responde 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "const login = pm.response.json();",
+              "pm.test(\"entrega un JWT bearer\", function () {",
+              "  pm.expect(login.token_type).to.eql(\"bearer\");",
+              "  pm.expect(login.access_token.split(\".\").length).to.eql(3);",
+              "});",
+              "pm.test(\"el JWT expira en 24 horas\", function () {",
+              "  pm.expect(login.expires_in).to.eql(86400);",
+              "});",
+              "// Se guarda el token para las peticiones siguientes",
+              "pm.collectionVariables.set(\"token\", login.access_token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        },
+        "description": "RF-02, criterios 1 y 2.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"identification\": \"{{identification}}\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "CP-RF02-03 Login con contrasena incorrecta",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"responde 401\", function () {",
+              "  pm.response.to.have.status(401);",
+              "});",
+              "// Se guarda el mensaje para compararlo con el de una cedula inexistente",
+              "pm.collectionVariables.set(\"wrong_password_detail\", pm.response.json().detail);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        },
+        "description": "RF-02, criterio 3.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"identification\": \"{{identification}}\",\n  \"password\": \"Incorrecta-123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "CP-RF02-03 Login con cedula inexistente",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"responde 401\", function () {",
+              "  pm.response.to.have.status(401);",
+              "});",
+              "pm.test(\"mismo mensaje que con contrasena incorrecta\", function () {",
+              "  pm.expect(pm.response.json().detail).to.eql(pm.collectionVariables.get(\"wrong_password_detail\"));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        },
+        "description": "RF-02, criterio 3. La cedula 600000000 no la genera la coleccion.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"identification\": \"600000000\",\n  \"password\": \"Incorrecta-123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "CP-RF02-04 Login con correo en vez de cedula",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"no autentica (401 o 422)\", function () {",
+              "  pm.expect(pm.response.code).to.be.oneOf([401, 422]);",
+              "  pm.expect(pm.response.text()).to.not.include(\"access_token\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        },
+        "description": "RF-02, criterio 4.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"identification\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "CP-RF02-05 Perfil propio con token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"responde 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"es el perfil de la persona autenticada\", function () {",
+              "  pm.expect(pm.response.json().identification).to.eql(pm.collectionVariables.get(\"identification\"));",
+              "});",
+              "// El perfil nunca debe exponer la contrasena ni su hash",
+              "pm.test(\"no expone la contrasena ni su hash\", function () {",
+              "  const profile = pm.response.json();",
+              "  for (const field of [\"password\", \"password_hash\", \"hashed_password\"]) {",
+              "    pm.expect(profile).to.not.have.property(field);",
+              "  }",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/me",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        },
+        "description": "RF-02, criterio 5."
+      }
+    },
+    {
+      "name": "CP-RF02-05 Perfil sin token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"responde 401\", function () {",
+              "  pm.response.to.have.status(401);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/users/me",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        },
+        "description": "RF-02, criterio 5; RNF-01, criterio 1."
+      }
+    },
+    {
+      "name": "CP-RNF01-02 Perfil con token alterado (DEF-A11)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// Altera el payload del token conservando la firma original",
+              "const parts = pm.collectionVariables.get(\"token\").split(\".\");",
+              "const tampered_payload = btoa(JSON.stringify({ sub: \"999999\" })).replace(/=+$/, \"\");",
+              "pm.collectionVariables.set(\"tampered_token\", parts[0] + \".\" + tampered_payload + \".\" + parts[2]);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"el token alterado no da acceso\", function () {",
+              "  pm.expect(pm.response.code).to.not.eql(200);",
+              "});",
+              "pm.test(\"DEF-A11: responde 401 sin detalles de configuracion\", function () {",
+              "  pm.response.to.have.status(401);",
+              "  pm.expect(pm.response.text()).to.not.include(\"SUPABASE\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tampered_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/me",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "me"
+          ]
+        },
+        "description": "RNF-01, criterios 1 y 7. La segunda prueba falla mientras DEF-A11 siga abierto."
+      }
+    },
+    {
+      "name": "CP-RNF01-01 Reset de contrasena sin verificacion (DEF-A01)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"DEF-A01: el reset sin prueba de control de la cuenta se rechaza\", function () {",
+              "  pm.expect(pm.response.code).to.not.eql(204);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/auth/reset-password",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "auth",
+            "reset-password"
+          ]
+        },
+        "description": "RNF-01, criterio 2. Falla mientras DEF-A01 siga abierto. Va al final porque cambia la contrasena de la cuenta de prueba.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"identification\": \"{{identification}}\",\n  \"email\": \"{{email}}\",\n  \"new_password\": \"Tomada-Postman-123\"\n}"
+        }
+      }
+    }
+  ]
 }

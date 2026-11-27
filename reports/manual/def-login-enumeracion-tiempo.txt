@@ -1,0 +1,13 @@
+Hallazgo 37 - Enumeracion de cuentas por tiempo de respuesta del login
+Fecha: 2026-11-27. Ambiente QA local. Script: tests/auth-seguridad/security/login_timing_check.py
+Login con contrasena incorrecta para la cedula sintetica 900000001 (registrada) y para 500000000 (inexistente), 20 veces cada una, alternadas.
+
+Samples per case: 20
+Status codes: [('registered', 401), ('unknown', 401)]
+Distinct response bodies: 1
+Registered identification, wrong password: median 244 ms, min 234 ms, max 339 ms
+Unknown identification: median 10 ms, min 8 ms, max 28 ms
+Slowest unknown vs fastest registered: 28 ms vs 234 ms
+
+Conclusion: el codigo (401) y el mensaje son identicos, pero los rangos de tiempo no se superponen:
+auth_service.authenticate_user responde de inmediato si la cedula no existe y solo calcula bcrypt cuando existe.
