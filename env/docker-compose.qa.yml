@@ -1,0 +1,152 @@
+# =============================================
+# Ambiente QA local de SynapSeed
+# ---------------------------------------------
+# Levanta SynapSeed sin servicios de terceros: Postgres con pgvector propio,
+# Redis, un LLM falso compatible con OpenRouter y autenticacion local (sin Supabase).
+# Es el unico ambiente donde se permiten pruebas de seguridad y de carga.
+#
+# Desde la raiz del repo:
+#   docker compose -f env/docker-compose.qa.yml up -d --build
+#   docker compose -f env/docker-compose.qa.yml exec backend python seed_synthetic.py
+#   docker compose -f env/docker-compose.qa.yml down        (agregar -v para borrar la base)
+#
+# Usa los mismos puertos que la configuracion original (8000 y 5173): hay que bajar
+# una antes de levantar la otra. Todos los puertos quedan solo en 127.0.0.1.
+
+name: synapseed-qa
+
+# Variables comunes de backend y worker. Ninguna es un secreto real: la base es
+# desechable y solo escucha en la maquina local, y el LLM es falso.
+x-backend-env: &backend-env
+  APP_ENV: development
+  DATABASE_URL: postgresql+asyncpg://qa:qa@db:5432/synapseed_qa
+  DATABASE_URL_SYNC: postgresql+psycopg2://qa:qa@db:5432/synapseed_qa
+  SUPABASE_URL: ""
+  SUPABASE_ANON_KEY: ""
+  REDIS_URL: redis://redis:6379/0
+  CELERY_BROKER_URL: redis://redis:6379/1
+  CELERY_RESULT_BACKEND: redis://redis:6379/2
+  OPENROUTER_BASE_URL: http://fake-llm:8080/v1
+  OPENROUTER_API_KEY: fake-local-key
+  BACKEND_CORS_ORIGINS: '["http://localhost:5173","http://127.0.0.1:5173"]'
+
+services:
+
+  # Postgres 16 con pgvector, igual a lo que exige la Spec
+  db:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: synapseed_qa
+      POSTGRES_USER: qa
+      POSTGRES_PASSWORD: qa
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - qa_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qa -d synapseed_qa"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Redis 7: broker de Celery y pub/sub del progreso
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # LLM falso: responde como OpenRouter con datos derivados del formulario
+  fake-llm:
+    image: python:3.12-slim
+    restart: unless-stopped
+    command: ["python", "/srv/fake_llm/server.py"]
+    environment:
+      FAKE_LLM_DELAY_MS: "${FAKE_LLM_DELAY_MS:-0}"
+    volumes:
+      - ./fake_llm:/srv/fake_llm:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Backend FastAPI con el codigo del submodulo, sin modificarlo.
+  # JWT_SECRET se genera al azar en cada arranque: nunca queda escrito en el repo.
+  backend:
+    restart: unless-stopped
+    build:
+      context: ../synapseed/src/backend
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      <<: *backend-env
+    # align_enums.py corrige en la base local la diferencia de enums entre migraciones y modelos
+    volumes:
+      - ./seed_synthetic.py:/app/seed_synthetic.py:ro
+      - ./align_enums.py:/app/align_enums.py:ro
+    command:
+      - sh
+      - -c
+      - >-
+        pip install --no-cache-dir --quiet "kombu>=5.4,<5.5" &&
+        export JWT_SECRET="$$(python -c 'import secrets; print(secrets.token_urlsafe(48))')" &&
+        alembic upgrade head &&
+        python align_enums.py &&
+        exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      fake-llm:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # Worker de Celery que ejecuta el pipeline de 4 agentes contra el LLM falso
+  worker:
+    restart: unless-stopped
+    build:
+      context: ../synapseed/src/backend
+      dockerfile: Dockerfile.worker
+    environment:
+      <<: *backend-env
+    command:
+      - sh
+      - -c
+      - >-
+        pip install --no-cache-dir --quiet "kombu>=5.4,<5.5" &&
+        exec celery -A app.workers.celery_app worker --loglevel=info
+        --concurrency=1 --prefetch-multiplier=1 --time-limit=600 --max-tasks-per-child=50
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # Frontend Vite; el proxy envia /api al backend
+  frontend:
+    restart: unless-stopped
+    build:
+      context: ../synapseed/src/frontend
+      dockerfile: Dockerfile
+      target: dev
+    environment:
+      VITE_API_URL: http://backend:8000
+    ports:
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  qa_db_data:

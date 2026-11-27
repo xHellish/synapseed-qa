@@ -52,9 +52,35 @@ Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Cal
 
    `env/docker-compose.kombu-fix.yml` es necesario: sin él, el worker no arranca (ver Decision Log). La aplicación queda en http://localhost:5173 y la documentación de la API en http://localhost:8000/docs.
 
-   Esta configuración solo sirve para exploración manual y pruebas funcionales: usa servicios de terceros, así que no se usa para pruebas de seguridad ni de carga. El ambiente QA local (Postgres propio y LLM simulado) todavía no existe; se agregará en `env/`.
+   Esta configuración solo sirve para exploración manual y pruebas funcionales: usa servicios de terceros, así que no se usa para pruebas de seguridad ni de carga.
 
-5. Pruebas del equipo QA. Las de Python usan el entorno del submódulo creado en el paso 2 y se corren desde la raíz de este repo:
+5. Levantar el **ambiente QA local**, el único donde se permiten pruebas de seguridad y de carga. No usa Supabase, OpenRouter ni Gemini, y no necesita `.env`. Desde la raíz de este repo:
+
+   ```bash
+   docker compose -f env/docker-compose.qa.yml up -d --build
+   docker compose -f env/docker-compose.qa.yml exec backend python seed_synthetic.py
+   ```
+
+   Usa los mismos puertos que el paso 4 (http://localhost:5173 y http://localhost:8000), así que hay que bajar uno antes de levantar el otro con `docker compose -f <archivo> down`. Para empezar con la base vacía: `docker compose -f env/docker-compose.qa.yml down -v`.
+
+   | Pieza | Qué hace |
+   |-------|----------|
+   | `db` | Postgres 16 con pgvector, desechable. Para revisar efectos de lado: `localhost:5433`, base `synapseed_qa`, usuario y contraseña `qa` |
+   | `fake-llm` (`env/fake_llm/server.py`) | Imita la API de OpenRouter y arma las respuestas de los 4 agentes con los datos del formulario. Una recomendación tarda unos 2 s |
+   | `backend` y `worker` | El código del submódulo sin cambios, con autenticación local (sin Supabase) y un `JWT_SECRET` aleatorio en cada arranque |
+   | `env/align_enums.py` | Corre después de las migraciones y deja los enums de la base igual que en Supabase (ver hallazgo 26) |
+   | `env/seed_synthetic.py` | Regulaciones del SFE, 3 distribuidores y 147 productos inventados, y 2 usuarios de prueba con una zona cada uno |
+
+   Datos para las pruebas:
+
+   - Usuarios de prueba: cédulas `900000001` y `900000002`. Las contraseñas están en `env/seed_synthetic.py`.
+   - Hay 3 productos activos por cada cultivo y problema de los catálogos. Además hay 3 casos especiales para Tomate y Papa: un producto con ingrediente prohibido (`QA-PROHIBIDO-1`), uno con registro cancelado (`QA-CANCELADO-1`) y uno sin datos de seguridad (`QA-INCOMPLETO-1`).
+   - Para pruebas de fiabilidad, si el problema contiene `QA_FORCE_LLM_ERROR` el LLM falso responde 500, y si contiene `QA_FORCE_INVALID_JSON` responde texto que no es JSON.
+   - Para pruebas de carga, `FAKE_LLM_DELAY_MS=3000 docker compose -f env/docker-compose.qa.yml up -d` agrega latencia simulada al LLM.
+
+   Con Docker dentro de WSL, la distro se apaga sola si no hay ninguna terminal de WSL abierta, y los contenedores se detienen con ella. Mientras prueban, dejen abierta una terminal de Ubuntu.
+
+6. Pruebas del equipo QA. Las de Python usan el entorno del submódulo creado en el paso 2 y se corren desde la raíz de este repo:
 
    ```bash
    synapseed\src\backend\.venv\Scripts\python -m pytest
@@ -119,4 +145,5 @@ Las variables van en `synapseed/.env`, que se crea copiando `synapseed/.env.exam
 - **Pruebas E2E**: Playwright (JavaScript)
 - **Pruebas de API**: Postman CLI
 - **Carga, seguridad y análisis estático**: k6, OWASP ZAP y SonarQube, corridos como imágenes de Docker
+- **Ambiente QA local**: Docker Compose con Postgres 16 + pgvector, Redis 7 y un LLM falso escrito con la librería estándar de Python
 - **Control de versiones**: Git con SynapSeed como submódulo

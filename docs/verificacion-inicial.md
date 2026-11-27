@@ -61,6 +61,16 @@ Con `DATABASE_URL` en el Session pooler (puerto 5432) y `env/docker-compose.komb
 23. **Catálogo incompleto en los productos recomendados.** Los 3 productos tienen `banda_toxicologica` y `cultivo_objetivo` vacíos, y Crypmont no tiene `ingrediente_activo`. La tabla comparativa del resultado no puede mostrar toxicidad, un dato de seguridad para quien aplica el producto.
 24. **Nombres de columnas distintos a los documentados.** La Spec validada describe `Product` con columnas en inglés (`name`, `active_ingredient`, `toxicity_band`); el modelo real usa nombres en español (`nombre_comercial`, `ingrediente_activo`, `banda_toxicologica`).
 
+## Hallazgos al construir el ambiente QA local
+
+Encontrados el 2026-11-26 al levantar SynapSeed desde cero con Postgres local (`env/docker-compose.qa.yml`).
+
+25. **El seed depende de archivos que no están en el repo.** `app/db/seed.py` carga productos y LMR desde `output/plaguicidas.csv`, `output/fertilizantes.csv` y `output/lmr.csv`, pero la carpeta `output/` no existe en el repositorio. En una instalación nueva el seed termina "exitosamente" sin cargar ningún producto, y el asistente no puede recomendar nada. Afecta la instalabilidad (Flexibilidad) y la reproducibilidad del sistema.
+26. **Las migraciones y los modelos definen enums incompatibles: una instalación desde cero no funciona.** `alembic/versions/001_initial_schema.py` crea los tipos `product_category`, `product_status`, `toxic_band`, `recommendation_status`, `audit_action` y `regulationtype` con etiquetas en minúscula (`pending`, `plaguicida`). Los modelos usan `SQLEnum` sin `values_callable`, así que escriben el nombre en mayúscula (`PENDING`, `PLAGUICIDA`). En una base creada solo con `alembic upgrade head`, el seed falla con `invalid input value for enum regulationtype: "DECRETO"`, y lo mismo pasaría al crear productos, recomendaciones o registros de auditoría. La base de Supabase tiene las etiquetas en mayúscula, así que no se creó con estas migraciones. Contorno para el ambiente QA: `env/align_enums.py`.
+27. **Restablecimiento de contraseña sin verificación en modo local.** `POST /api/v1/auth/reset-password` es público y, cuando Supabase no está configurado (`_local_auth_enabled()`), cambia la contraseña de cualquier cuenta con solo conocer su cédula y su correo, sin token ni confirmación. No aparece en la Spec. Pendiente de verificar como prueba de seguridad en el ambiente QA local, donde ese modo está activo.
+
+Matiz sobre el hallazgo 12: en el ambiente local, una falla del LLM (500 inducido) sí deja la recomendación en `FAILED` con `error_message` en unos 17 s. La recomendación se queda en `PENDING` cuando la excepción ocurre antes, en el acceso a la base de datos.
+
 ## Datos existentes en la base
 
 La base de Supabase no está vacía: trae 7 usuarios, 9 zonas, 55 recomendaciones y 3672 registros de auditoría de junio de 2026, además del catálogo cargado por el seed (13401 productos, 565 distribuidores, 8528 LMR, 5 regulaciones, ninguno con embeddings). Las reglas del proyecto exigen datos sintéticos; esos usuarios pueden contener datos personales reales y no deben usarse en las pruebas ni copiarse a la evidencia.

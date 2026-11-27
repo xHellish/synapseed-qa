@@ -7,7 +7,7 @@ El repo separa el sistema auditado del trabajo del auditor. SynapSeed entra como
 | Carpeta | Responsabilidad |
 |---------|-----------------|
 | `synapseed/` | Submódulo con el sistema auditado, fijado en el commit `ec14b12`. No se modifica: los defectos se reportan, no se corrigen |
-| `env/` | Ambiente QA local: configuración para levantar SynapSeed sin servicios de terceros y datos sintéticos |
+| `env/` | Ambientes de ejecución: `docker-compose.kombu-fix.yml` (configuración original con Supabase) y el ambiente QA local `docker-compose.qa.yml` con su LLM falso (`fake_llm/`), el contorno de enums (`align_enums.py`) y el seed sintético (`seed_synthetic.py`) |
 | `tests/` (raíz) | Configuración compartida: `conftest.py` (path al backend, marcas por tipo, fixtures comunes), `playwright.config.js` y `package.json` de Playwright |
 | `tests/auth-seguridad/` | Área de la Persona A: registro, inicio de sesión, verificaciones de seguridad y escenarios de carga |
 | `tests/zonas-catalogos/` | Área de la Persona B: zonas de cultivo y catálogos del asistente |
@@ -42,7 +42,68 @@ C4Context
     Rel(synapseed, llm, "Usa en producción")
 ```
 
+## Ambiente QA local
+
+El enunciado solo permite pruebas de seguridad y de carga sobre un ambiente levantado por el equipo. `env/docker-compose.qa.yml` levanta SynapSeed completo sin servicios de terceros y sin modificar el submódulo.
+
+```mermaid
+flowchart LR
+    tests["Pruebas del equipo<br/>pytest, Playwright, k6, ZAP"] --> frontend["frontend<br/>Vite :5173"]
+    tests --> backend["backend<br/>FastAPI :8000"]
+    tests -. verifica efectos de lado .-> db
+    frontend -- proxy /api --> backend
+    backend --> db[("db<br/>Postgres 16 + pgvector")]
+    backend --> redis[("redis")]
+    redis --> worker["worker<br/>Celery, 4 agentes"]
+    worker --> db
+    worker --> fake["fake-llm<br/>API compatible con OpenRouter"]
+```
+
+Flujo de arranque del backend:
+
+1. Instala `kombu` compatible (mismo contorno que la configuración original).
+2. Genera un `JWT_SECRET` aleatorio.
+3. Corre `alembic upgrade head`.
+4. Corre `align_enums.py`.
+5. Levanta uvicorn.
+
+El seed sintético se corre a mano una vez por base nueva.
+
+Cómo responde el LLM falso:
+
+- Distingue el agente por el nombre del schema que el cliente inyecta en el prompt de sistema (`ContextAnalysisOutput`, `_LegalLLMReview`, `_SynthesisLLMResponse`).
+- El analizador devuelve el cultivo y el problema del formulario.
+- El validador legal aprueba todos los candidatos que sobrevivieron a las reglas duras.
+- El sintetizador justifica los productos que recibe.
+
+Así se prueba todo el código del pipeline (búsqueda, reglas regulatorias, persistencia, estados) sin depender del contenido variable de un LLM real. La calidad del texto y la pertinencia agronómica de las recomendaciones no se evalúan en este ambiente: eso queda para la configuración original y la validación con personas.
+
 ## Decision Log
+
+### [2026-11-26] Ambiente QA local con Postgres propio, LLM falso y seed sintético
+
+**Contexto:** Las pruebas de seguridad y de carga no pueden correr contra Supabase, OpenRouter ni Gemini. SynapSeed no trae un ambiente local funcional:
+- `docker-compose.yml` no define base de datos;
+- el worker usa siempre `OpenRouterLLMClient`;
+- el seed depende de CSV que no están en el repo (hallazgo 25);
+- una base creada con las migraciones rechaza los valores de enum que escribe el ORM (hallazgo 26).
+
+**Decisión:** Un compose propio en `env/docker-compose.qa.yml` con estas piezas:
+- **Postgres pgvector local.**
+- **LLM falso** hecho con la librería estándar de Python. Se apunta `OPENROUTER_BASE_URL` a él, así el cliente real de SynapSeed se ejecuta sin cambios.
+- **Autenticación local**, dejando vacías las variables de Supabase.
+- **Script que alinea los enums** con los de Supabase después de las migraciones.
+- **Seed sintético** que reutiliza las funciones `seed_regulations` y `link_products_distributors` del sistema.
+
+Los valores del compose no son secretos reales, porque la base es desechable y solo escucha en 127.0.0.1. El `JWT_SECRET` se genera al azar en cada arranque.
+
+**Consecuencias:**
+- El ambiente se levanta con dos comandos, sin `.env` y sin costo.
+- Las recomendaciones tardan unos 2 s, así que las pruebas de carga miden el sistema y no al LLM. Se puede simular latencia con `FAKE_LLM_DELAY_MS`.
+- La pertinencia de las recomendaciones no se puede evaluar aquí.
+- El modo de autenticación local habilita `POST /auth/reset-password` (hallazgo 27). Es parte de lo que se audita, no un efecto secundario a evitar.
+- Reiniciar el backend invalida los tokens emitidos.
+- Con Docker en WSL hay que mantener una terminal de WSL abierta. Por eso los servicios usan `restart: unless-stopped`.
 
 ### [2026-11-26] Herramientas externas por Docker y variables documentadas en el README
 
