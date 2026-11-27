@@ -13,7 +13,8 @@ import pytest
 TESTS_DIR = Path(__file__).resolve().parent
 BACKEND_DIR = TESTS_DIR.parent / "synapseed" / "src" / "backend"
 MARKED_TYPES = ["unit", "integration", "security", "performance"]
-DEFAULT_API_URL = "http://localhost:8000/api/v1"
+# 127.0.0.1 y no localhost: en Windows localhost intenta IPv6 primero y agrega ~2 s por peticion
+DEFAULT_API_URL = "http://127.0.0.1:8000/api/v1"
 
 # =============================================
 # Ruta al codigo auditado

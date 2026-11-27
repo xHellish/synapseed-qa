@@ -78,7 +78,15 @@ Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Cal
    - Para pruebas de fiabilidad, si el problema contiene `QA_FORCE_LLM_ERROR` el LLM falso responde 500, y si contiene `QA_FORCE_INVALID_JSON` responde texto que no es JSON.
    - Para pruebas de carga, `FAKE_LLM_DELAY_MS=3000 docker compose -f env/docker-compose.qa.yml up -d` agrega latencia simulada al LLM.
 
-   Con Docker dentro de WSL, la distro se apaga sola si no hay ninguna terminal de WSL abierta, y los contenedores se detienen con ella. Mientras prueban, dejen abierta una terminal de Ubuntu.
+   Si Docker está instalado dentro de WSL y no como Docker Desktop, el comando `docker` no existe en PowerShell: los comandos de este paso se corren en una terminal de Ubuntu, donde el disco `E:` se ve como `/mnt/e`:
+
+   ```bash
+   cd "/mnt/e/Escritorio/Proyecto Integrado QA/synapseed-qa"
+   docker compose -f env/docker-compose.qa.yml up -d
+   docker compose -f env/docker-compose.qa.yml ps
+   ```
+
+   La distro se apaga sola si no hay ninguna terminal de WSL abierta, y los contenedores se detienen con ella. Mientras prueban, dejen abierta esa terminal de Ubuntu. Los datos del seed se conservan entre reinicios; solo hay que volver a cargarlos después de un `down -v`.
 
 6. Pruebas del equipo QA. Las de Python usan el entorno del submódulo creado en el paso 2 y se corren desde la raíz de este repo:
 
@@ -93,6 +101,8 @@ Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Cal
    | Solo un tipo | `-m unit`, `-m integration` o `-m security` |
    | Solo un área | `tests/zonas-catalogos` |
    | Con cobertura | `--cov=synapseed/src/backend/app --cov-report=html:reports/coverage` |
+
+   Las pruebas de integración necesitan el ambiente QA local del paso 5; si no está arriba, se saltan. Las que confirman un defecto conocido aparecen como `XFAIL`, no como fallo (ver Documentation).
 
    Las E2E (Playwright) se corren desde `tests/`; la primera vez hay que instalar el navegador:
 

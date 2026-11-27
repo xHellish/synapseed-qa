@@ -19,6 +19,9 @@ El repo separa el sistema auditado del trabajo del auditor. SynapSeed entra como
 ### Cómo se ejecutan las pruebas
 
 - **pytest** corre desde la raíz con el Python del submódulo. `pytest.ini` usa `--import-mode=importlib`, que permite archivos con el mismo nombre en áreas distintas. `tests/conftest.py` agrega `synapseed/src/backend` al path para importar `app.*` y marca cada prueba según la subcarpeta de tipo, así `-m unit` junta las unitarias de las tres áreas.
+- **Fixtures por área**: cada área puede tener su propio `conftest.py` con sus fixtures. El de `auth-seguridad` trae un cliente HTTP con `urllib` (`api`), que salta las pruebas si el ambiente QA no responde, usuarios sintéticos con cédulas que empiezan en 8 para no chocar con el seed, y una conexión de lectura a la base local (`qa_db`, configurable con `QA_DB_URL`).
+- **Defectos conocidos**: una prueba que confirma un defecto lleva `@pytest.mark.xfail(strict=True, reason="Hallazgo N ...")`. Aparece como `XFAIL`, la suite sigue en verde y, si el defecto se corrige, pasa a `XPASS` y la suite falla para que se quite la marca.
+- **URLs por defecto**: se usa `127.0.0.1` y no `localhost`, porque en Windows `localhost` intenta primero IPv6 y agrega unos 2 s a cada petición (11 pruebas de integración pasaron de 49 s a 5 s).
 - **Playwright** usa una sola configuración en `tests/` que busca `**/e2e/**/*.spec.js`. Guarda traza y captura de cada fallo y un reporte HTML por corrida en `reports/e2e/`.
 - **k6, ZAP y SonarQube** se corren con sus imágenes oficiales de Docker, sin instalar nada en las máquinas. `sonar-project.properties` limita el análisis al código de SynapSeed.
 
@@ -79,6 +82,12 @@ Cómo responde el LLM falso:
 Así se prueba todo el código del pipeline (búsqueda, reglas regulatorias, persistencia, estados) sin depender del contenido variable de un LLM real. La calidad del texto y la pertinencia agronómica de las recomendaciones no se evalúan en este ambiente: eso queda para la configuración original y la validación con personas.
 
 ## Decision Log
+
+### [2026-11-26] Los defectos conocidos se marcan con xfail estricto
+
+**Contexto:** Algunas pruebas automatizadas existen para confirmar un defecto, como `test_cp_rf01_07_esquemas_de_registro_consistentes` (hallazgo 17). Si fallan en rojo, la suite queda rota para todo el equipo y se pierde la señal de los fallos nuevos. Si se omiten, el defecto no queda trazado a ninguna prueba.
+**Decisión:** Esas pruebas llevan `@pytest.mark.xfail(strict=True, reason="Hallazgo N ...")`. Aparecen como `XFAIL` y la suite sigue en verde; si alguien corrige el defecto, la prueba pasa a `XPASS` y la suite falla, para que se quite la marca. En el caso de prueba, el estado queda como "Falla" con el número de hallazgo.
+**Consecuencias:** El reporte de pytest distingue los defectos conocidos de los fallos nuevos. Cada `reason` apunta al hallazgo, y después al ID del defecto en `defectos.md`.
 
 ### [2026-11-26] Ambiente QA local con Postgres propio, LLM falso y seed sintético
 
