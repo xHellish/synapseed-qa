@@ -1,0 +1,103 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: /scripts/recommendation_load.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 10 max VUs, 25m30s max duration (incl. graceful stop):
+              * concurrent_recommendations: 2 iterations for each of 10 VUs (maxDuration: 25m0s, gracefulStop: 30s)
+
+
+Run                          [ 100% ] setup()
+concurrent_recommendations   [   0% ]
+
+Run                          [ 100% ] setup()
+concurrent_recommendations   [   0% ]
+
+Run                          [ 100% ] setup()
+concurrent_recommendations   [   0% ]
+
+Run                          [ 100% ] setup()
+concurrent_recommendations   [   0% ]
+
+Run                          [ 100% ] setup()
+concurrent_recommendations   [   0% ]
+
+running (00m06.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m00.8s/25m0s  00/20 iters, 2 per VU
+
+running (00m07.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m01.8s/25m0s  00/20 iters, 2 per VU
+
+running (00m08.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m02.8s/25m0s  00/20 iters, 2 per VU
+
+running (00m09.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  00m03.8s/25m0s  08/20 iters, 2 per VU
+
+running (00m10.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  00m04.8s/25m0s  08/20 iters, 2 per VU
+
+running (00m11.0s), 10/10 VUs, 10 complete and 0 interrupted iterations
+concurrent_recommendations   [  50% ] 10 VUs  00m05.8s/25m0s  10/20 iters, 2 per VU
+
+running (00m12.0s), 02/10 VUs, 18 complete and 0 interrupted iterations
+concurrent_recommendations   [  90% ] 10 VUs  00m06.8s/25m0s  18/20 iters, 2 per VU
+
+running (00m13.0s), 02/10 VUs, 18 complete and 0 interrupted iterations
+concurrent_recommendations   [  90% ] 10 VUs  00m07.8s/25m0s  18/20 iters, 2 per VU
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{endpoint:request}
+    ✓ 'p(95)<1000' p(95)=837.12ms
+
+    recommendation_completed
+    ✓ 'rate==1' rate=100.00%
+
+    recommendation_total_ms
+    ✓ 'p(95)<=50000' p(95)=5.56s
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......................: 60      4.585126/s
+    checks_succeeded...................: 100.00% 60 out of 60
+    checks_failed......................: 0.00%   0 out of 60
+
+    ✓ request 202
+    ✓ request returns id
+    ✓ recommendation completed
+
+    CUSTOM
+    recommendation_completed................................................: 100.00% 20 out of 20
+    recommendation_total_ms.................................................: avg=3.33s    min=2.24s   med=3.18s    max=5.61s    p(90)=3.89s    p(95)=5.56s   
+
+    HTTP
+    http_req_duration.......................................................: avg=450.85ms min=89.17ms med=417.63ms max=871.01ms p(90)=815.46ms p(95)=836.02ms
+      { endpoint:request }..................................................: avg=576.09ms min=89.17ms med=599.93ms max=840.37ms p(90)=836.51ms p(95)=837.12ms
+      { expected_response:true }............................................: avg=450.85ms min=89.17ms med=417.63ms max=871.01ms p(90)=815.46ms p(95)=836.02ms
+    http_req_failed.........................................................: 0.00%   0 out of 62
+    http_reqs...............................................................: 62      4.737963/s
+
+    EXECUTION
+    iteration_duration......................................................: avg=3.33s    min=2.24s   med=3.18s    max=5.61s    p(90)=3.89s    p(95)=5.56s   
+    iterations..............................................................: 20      1.528375/s
+    vus.....................................................................: 2       min=0        max=10
+    vus_max.................................................................: 10      min=10       max=10
+
+    NETWORK
+    data_received...........................................................: 58 kB   4.4 kB/s
+    data_sent...............................................................: 22 kB   1.6 kB/s
+
+
+
+
+running (00m13.1s), 00/10 VUs, 20 complete and 0 interrupted iterations
+concurrent_recommendations ✓ [ 100% ] 10 VUs  00m07.9s/25m0s  20/20 iters, 2 per VU

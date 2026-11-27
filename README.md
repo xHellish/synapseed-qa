@@ -76,7 +76,7 @@ Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Cal
    - Usuarios de prueba: cédulas `900000001` y `900000002`. Las contraseñas están en `env/seed_synthetic.py`.
    - Hay 3 productos activos por cada cultivo y problema de los catálogos. Además hay 3 casos especiales para Tomate y Papa: un producto con ingrediente prohibido (`QA-PROHIBIDO-1`), uno con registro cancelado (`QA-CANCELADO-1`) y uno sin datos de seguridad (`QA-INCOMPLETO-1`).
    - Para pruebas de fiabilidad, si el problema contiene `QA_FORCE_LLM_ERROR` el LLM falso responde 500, y si contiene `QA_FORCE_INVALID_JSON` responde texto que no es JSON.
-   - Para pruebas de carga, `FAKE_LLM_DELAY_MS=3000 docker compose -f env/docker-compose.qa.yml up -d` agrega latencia simulada al LLM.
+   - Para pruebas de carga, `FAKE_LLM_DELAY_MS=3000 docker compose -f env/docker-compose.qa.yml up -d --force-recreate fake-llm` agrega latencia simulada al LLM. Para quitarla, el mismo comando con `FAKE_LLM_DELAY_MS=0`; sin `--force-recreate` el contenedor puede quedar con el valor anterior.
 
    Si Docker está instalado dentro de WSL y no como Docker Desktop, el comando `docker` no existe en PowerShell: los comandos de este paso se corren en una terminal de Ubuntu, donde el disco `E:` se ve como `/mnt/e`:
 
@@ -101,6 +101,7 @@ Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Cal
    | Solo un tipo | `-m unit`, `-m integration` o `-m security` |
    | Solo un área | `tests/zonas-catalogos` |
    | Con cobertura | `--cov=synapseed/src/backend/app --cov-report=html:reports/coverage` |
+   | Guardando evidencia | `tests/<área> -v -rxX --junitxml=reports/pytest/<área>.xml > reports/pytest/<área>.txt` |
 
    Las pruebas de integración necesitan el ambiente QA local del paso 5; si no está arriba, se saltan. Las que confirman un defecto conocido aparecen como `XFAIL`, no como fallo (ver Documentation).
 
@@ -114,6 +115,13 @@ Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Cal
    ```
 
    El reporte HTML queda en `reports/e2e/html`. Para correr solo un área: `npx playwright test recomendacion`. Las URLs del ambiente se cambian con `QA_API_URL` y `QA_WEB_URL`.
+
+   Las pruebas de carga (k6) se corren desde una terminal de WSL en la raíz del repo, con el ambiente QA arriba. El script usa la imagen `grafana/k6` y deja la salida y el resumen en `reports/k6/`:
+
+   ```bash
+   bash tests/auth-seguridad/performance/run_k6.sh auth_read_load.js perf-01
+   bash tests/auth-seguridad/performance/run_k6.sh recommendation_load.js perf-02-delay-0
+   ```
 
 ## Organización del trabajo
 

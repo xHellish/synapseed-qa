@@ -1,0 +1,85 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-8.3.4, pluggy-1.7.0 -- E:\Escritorio\Proyecto Integrado QA\synapseed-qa\synapseed\src\backend\.venv\Scripts\python.exe
+rootdir: E:\Escritorio\Proyecto Integrado QA\synapseed-qa
+configfile: pytest.ini
+plugins: anyio-4.16.0, langsmith-0.3.45, platformdirs-4.14.8, asyncio-0.25.0, cov-6.0.0, httpx-0.30.0
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=function
+collecting ... collected 57 items
+
+tests/auth-seguridad/integration/test_auth_api.py::test_cp_rf01_01_registro_valido PASSED [  1%]
+tests/auth-seguridad/integration/test_auth_api.py::test_cp_rf01_02_cedula_duplicada PASSED [  3%]
+tests/auth-seguridad/integration/test_auth_api.py::test_cp_rf01_03_cedula_invalida_en_api PASSED [  5%]
+tests/auth-seguridad/integration/test_auth_api.py::test_cp_rf01_04_correo_invalido_en_api PASSED [  7%]
+tests/auth-seguridad/integration/test_auth_api.py::test_cp_rf01_05_contrasena_guardada_con_bcrypt PASSED [  8%]
+tests/auth-seguridad/integration/test_auth_api.py::test_cp_rf01_06_campo_obligatorio_ausente_en_api PASSED [ 10%]
+tests/auth-seguridad/integration/test_auth_api.py::test_cp_rf02_01_login_valido PASSED [ 12%]
+tests/auth-seguridad/integration/test_auth_api.py::test_cp_rf02_02_expiracion_del_jwt PASSED [ 14%]
+tests/auth-seguridad/integration/test_auth_api.py::test_cp_rf02_03_mismo_rechazo_para_contrasena_y_cedula PASSED [ 15%]
+tests/auth-seguridad/integration/test_auth_api.py::test_cp_rf02_04_login_con_correo_no_autentica PASSED [ 17%]
+tests/auth-seguridad/integration/test_auth_api.py::test_cp_rf02_05_perfil_propio_con_y_sin_token PASSED [ 19%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_01_reset_sin_verificacion_no_toma_la_cuenta XFAIL [ 21%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_01_reset_con_datos_erroneos_no_revela_la_cuenta PASSED [ 22%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_no_da_acceso[alg_none] PASSED [ 24%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_no_da_acceso[payload_alterado] PASSED [ 26%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_no_da_acceso[secreto_ajeno] PASSED [ 28%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_no_da_acceso[vencido] PASSED [ 29%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_no_da_acceso[basura] PASSED [ 31%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[alg_none] XFAIL [ 33%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[payload_alterado] XFAIL [ 35%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[secreto_ajeno] XFAIL [ 36%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[vencido] XFAIL [ 38%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[basura] XFAIL [ 40%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_03_zona_ajena_inaccesible PASSED [ 42%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_03_recomendacion_ajena_inaccesible PASSED [ 43%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_03_stream_de_progreso_exige_token XFAIL [ 45%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_user_id_del_cuerpo_se_ignora PASSED [ 47%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza[campo_desconocido] XFAIL [ 49%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza[nombre_numerico] XFAIL [ 50%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza[latitud_texto] XFAIL [ 52%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_frontend_no_inserta_html_crudo PASSED [ 54%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_05_error_500_sin_traceback XFAIL [ 56%]
+tests/auth-seguridad/security/test_security.py::test_cp_rnf01_06_login_limita_intentos_fallidos XFAIL [ 57%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_03_cedula_formato_y_limites[81234567-False] PASSED [ 59%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_03_cedula_formato_y_limites[812345678-True] PASSED [ 61%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_03_cedula_formato_y_limites[812345678901-True] PASSED [ 63%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_03_cedula_formato_y_limites[8123456789012-False] PASSED [ 64%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_03_cedula_formato_y_limites[8-1234-5678-True] PASSED [ 66%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_03_cedula_formato_y_limites[81234567A-False] PASSED [ 68%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_03_cedula_formato_y_limites[-False] PASSED [ 70%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_03_cedula_mensaje_de_error PASSED [ 71%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_03_cedula_con_guiones_se_normaliza PASSED [ 73%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_04_correo_invalido[sin-arroba.example.com] PASSED [ 75%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_04_correo_invalido[qa@] PASSED [ 77%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_04_correo_invalido[qa@dominio] PASSED [ 78%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_04_correo_invalido[qa @example.com] PASSED [ 80%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_04_correo_invalido[@example.com] PASSED [ 82%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_06_campo_obligatorio_ausente[email] PASSED [ 84%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_06_campo_obligatorio_ausente[full_name] PASSED [ 85%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_06_campo_obligatorio_ausente[identification] PASSED [ 87%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_06_campo_obligatorio_ausente[phone] PASSED [ 89%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_06_campo_obligatorio_ausente[password] PASSED [ 91%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes0] XFAIL [ 92%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes1] XFAIL [ 94%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes2] XFAIL [ 96%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes3] XFAIL [ 98%]
+tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf02_04_login_con_correo_se_rechaza PASSED [100%]
+
+- generated xml file: E:\Escritorio\Proyecto Integrado QA\synapseed-qa\reports\pytest\auth-seguridad.xml -
+=========================== short test summary info ===========================
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_01_reset_sin_verificacion_no_toma_la_cuenta - Hallazgo 27: reset-password cambia la contrasena con solo cedula y correo
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[alg_none] - Hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[payload_alterado] - Hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[secreto_ajeno] - Hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[vencido] - Hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[basura] - Hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_03_stream_de_progreso_exige_token - Hallazgo 28: el stream SSE de progreso no exige token
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza[campo_desconocido] - Hallazgo 15: zonas recibe un dict sin schema y acepta cualquier campo
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza[nombre_numerico] - Hallazgo 15: zonas recibe un dict sin schema y acepta cualquier campo
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza[latitud_texto] - Hallazgo 15: zonas recibe un dict sin schema y acepta cualquier campo
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_05_error_500_sin_traceback - Hallazgo 14: DEBUG=True por defecto devuelve el traceback en los 500
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_06_login_limita_intentos_fallidos - Hallazgo 30: el login no limita los intentos fallidos
+XFAIL tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes0] - Hallazgo 17: RegisterRequest y UserRegister definen reglas distintas
+XFAIL tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes1] - Hallazgo 17: RegisterRequest y UserRegister definen reglas distintas
+XFAIL tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes2] - Hallazgo 17: RegisterRequest y UserRegister definen reglas distintas
+XFAIL tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes3] - Hallazgo 17: RegisterRequest y UserRegister definen reglas distintas
+======================= 41 passed, 16 xfailed in 31.11s =======================

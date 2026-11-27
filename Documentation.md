@@ -14,7 +14,7 @@ El repo separa el sistema auditado del trabajo del auditor. SynapSeed entra como
 | `tests/recomendacion/` | Área de la Persona C: pipeline de recomendación, proveedores e historial |
 | `tests/<área>/<tipo>/` | Dentro de cada área: `unit` (dobles de prueba), `integration` (efecto de lado en la base o la cola), `e2e` (Playwright), `api` (colección de Postman); en auth-seguridad además `security` y `performance` (k6) |
 | `docs/` | Plan de calidad, GQM y fichas de métricas, estáticas, casos de prueba por persona, UAT, usabilidad, matriz de trazabilidad, defectos e informe final |
-| `reports/` | Evidencia de cada corrida: `coverage`, `ruff`, `sonar`, `k6`, `zap`, `e2e` |
+| `reports/` | Evidencia de cada corrida: `pytest`, `coverage`, `ruff`, `sonar`, `k6`, `zap`, `e2e`. Es lo que respalda el campo Evidencia de cada caso de prueba en el informe final |
 
 ### Cómo se ejecutan las pruebas
 
@@ -23,7 +23,7 @@ El repo separa el sistema auditado del trabajo del auditor. SynapSeed entra como
 - **Defectos conocidos**: una prueba que confirma un defecto lleva `@pytest.mark.xfail(strict=True, reason="Hallazgo N ...")`. Aparece como `XFAIL`, la suite sigue en verde y, si el defecto se corrige, pasa a `XPASS` y la suite falla para que se quite la marca.
 - **URLs por defecto**: se usa `127.0.0.1` y no `localhost`, porque en Windows `localhost` intenta primero IPv6 y agrega unos 2 s a cada petición (11 pruebas de integración pasaron de 49 s a 5 s).
 - **Playwright** usa una sola configuración en `tests/` que busca `**/e2e/**/*.spec.js`. Guarda traza y captura de cada fallo y un reporte HTML por corrida en `reports/e2e/`.
-- **k6, ZAP y SonarQube** se corren con sus imágenes oficiales de Docker, sin instalar nada en las máquinas. `sonar-project.properties` limita el análisis al código de SynapSeed.
+- **k6, ZAP y SonarQube** se corren con sus imágenes oficiales de Docker, sin instalar nada en las máquinas. `tests/auth-seguridad/performance/run_k6.sh` une el contenedor de k6 (`grafana/k6:1.0.0`) a la red `synapseed-qa_default`, así llega al backend por nombre, y guarda la salida y el resumen JSON de cada corrida en `reports/k6/`. Si un umbral no se cumple, k6 sale con código 99: el script lo informa y conserva los reportes. Los umbrales se declaran en `docs/plan-calidad.md` antes de correr. `.gitattributes` fuerza LF en los `.sh`, porque con `core.autocrlf=true` llegarían con CRLF y bash fallaría en WSL. `sonar-project.properties` limita el análisis al código de SynapSeed.
 
 ```mermaid
 C4Context

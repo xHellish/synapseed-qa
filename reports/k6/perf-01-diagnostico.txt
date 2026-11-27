@@ -1,0 +1,3 @@
+Catalog alone: median 10.4 ms, max 27.4 ms
+Single login: 250 ms
+Catalog during 10 concurrent logins: median 2402.7 ms, max 2873.7 ms

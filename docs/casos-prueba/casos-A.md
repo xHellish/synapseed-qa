@@ -26,8 +26,10 @@ Los resultados esperados salen de los criterios de aceptación de `docs/requisit
 | CP-RNF01-04 (SEC-04) | Validación de entrada en zonas | RNF-01 (5) | Partición: campo extra, tipo incorrecto, HTML | Seguridad | Falla (hallazgo 15) |
 | CP-RNF01-05 (SEC-05) | Detalles internos en errores | RNF-01 (7) | Adivinación de errores: provocar un 500 | Seguridad | Falla (hallazgo 14) |
 | CP-RNF01-06 (SEC-06) | Fuerza bruta en el login | RNF-01 (8) | Prueba de ataque: 30 intentos seguidos | Seguridad | Falla (hallazgo 30) |
+| CP-RNF04-01 (PERF-01) | Carga de autenticación y lectura | RNF-04 (3) | Prueba de carga con umbrales previos | Rendimiento | Falla (hallazgo 31) |
+| CP-RNF04-02 (PERF-02) | Recomendaciones simultáneas | RNF-04 (1, 2), RNF-03 (1) | Prueba de carga con umbrales previos | Rendimiento | Pasa sin latencia; falla con latencia (hallazgo 32) |
 
-Ejecución: 2026-11-26 contra el ambiente QA local (`env/docker-compose.qa.yml`), con `synapseed\src\backend\.venv\Scripts\python -m pytest tests/auth-seguridad`. Resultado: 41 pruebas pasan y 16 fallan como se esperaba (`xfail`): 4 del hallazgo 17 y 12 de las verificaciones de seguridad. El detalle de los ataques está en `tests/auth-seguridad/security/verificaciones.md`.
+Ejecución: 2026-11-26 contra el ambiente QA local (`env/docker-compose.qa.yml`), con `synapseed\src\backend\.venv\Scripts\python -m pytest tests/auth-seguridad`. Resultado: 41 pruebas pasan y 16 fallan como se esperaba (`xfail`): 4 del hallazgo 17 y 12 de las verificaciones de seguridad. El detalle de los ataques está en `tests/auth-seguridad/security/verificaciones.md`. Los escenarios de carga se corren con k6 (`tests/auth-seguridad/performance/run_k6.sh`) y sus resultados están en `tests/auth-seguridad/performance/resultados.md`. La salida completa de cada corrida queda en `reports/`.
 
 Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(strict=True, reason="Hallazgo N ...")`: la suite queda en verde, el defecto queda visible en el reporte como `XFAIL` y, si alguien lo corrige, la prueba pasa a `XPASS` y la suite falla para que se quite la marca.
 
@@ -48,7 +50,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | 201; el cuerpo trae la cédula y el correo enviados y no trae `password`, `password_hash` ni `hashed_password` |
 | Resultado obtenido | 201 con el perfil; ningún campo sensible en la respuesta |
 | Estado | Pasa |
-| Evidencia | Corrida de pytest del 2026-11-26 |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Persona A |
 
 ## CP-RF01-02
@@ -68,7 +70,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | Rechazo (la API define 409) con un mensaje que menciona la cédula |
 | Resultado obtenido | 409, "La cédula ya está registrada" |
 | Estado | Pasa |
-| Evidencia | Corrida de pytest del 2026-11-26 |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Persona A |
 
 ## CP-RF01-03
@@ -88,7 +90,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | Se aceptan de 9 a 12 dígitos y se rechaza el resto; el error nombra el campo `identification`. La regla de 9 a 12 dígitos viene del código, porque la Spec no define el formato (ver observaciones de `requisitos.md`) |
 | Resultado obtenido | Los 7 valores se comportan como se esperaba; la API responde 422 y el detalle nombra `identification` |
 | Estado | Pasa |
-| Evidencia | Corrida de pytest del 2026-11-26 |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Persona A |
 
 ## CP-RF01-04
@@ -108,7 +110,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | Rechazo de las 5 clases; la API responde 422 |
 | Resultado obtenido | Las 5 se rechazan; la API responde 422 |
 | Estado | Pasa |
-| Evidencia | Corrida de pytest del 2026-11-26 |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Persona A |
 
 ## CP-RF01-05
@@ -128,7 +130,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | `users.password_hash` es distinto de la contraseña y tiene el prefijo de bcrypt (`$2b$` o `$2a$`) |
 | Resultado obtenido | Hash con prefijo `$2b$` |
 | Estado | Pasa |
-| Evidencia | Corrida de pytest del 2026-11-26 |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Persona A |
 
 ## CP-RF01-06
@@ -148,7 +150,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | Rechazo en los 5 casos; la API responde 422 |
 | Resultado obtenido | Rechazo en los 5 casos; la API responde 422 |
 | Estado | Pasa |
-| Evidencia | Corrida de pytest del 2026-11-26 |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Persona A |
 
 ## CP-RF01-07
@@ -168,7 +170,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | Ambos esquemas aceptan o rechazan los mismos datos |
 | Resultado obtenido | Los 4 valores se aceptan en `app/schemas/auth.py` (`RegisterRequest`: cédula de 5 o más, contraseña de 6 o más) y se rechazan en `app/schemas/user.py` (`UserRegister`: cédula de 9 a 12 dígitos, contraseña de 8 o más). El router usa `UserRegister`, así que hoy rige la regla más estricta, pero la duplicación deja dos fuentes de verdad |
 | Estado | Falla; confirma el hallazgo 17 |
-| Evidencia | Corrida de pytest del 2026-11-26 (4 `XFAIL`) |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (4 `XFAIL`) |
 | Responsable | Persona A |
 
 ## CP-RF02-01
@@ -188,7 +190,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | 200; `token_type` `bearer`; `access_token` con forma de JWT (3 segmentos); el usuario de la respuesta sin campos sensibles |
 | Resultado obtenido | 200 con JWT de 3 segmentos y usuario sin campos sensibles |
 | Estado | Pasa |
-| Evidencia | Corrida de pytest del 2026-11-26 |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Persona A |
 
 ## CP-RF02-02
@@ -208,7 +210,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | `exp - iat` igual a 86400 s (24 horas) y `expires_in` igual a 86400 |
 | Resultado obtenido | 86400 en ambos |
 | Estado | Pasa |
-| Evidencia | Corrida de pytest del 2026-11-26 |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Persona A |
 
 ## CP-RF02-03
@@ -228,7 +230,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | Ambos rechazados (la API define 401) con el mismo mensaje |
 | Resultado obtenido | 401 en ambos, "Cédula o contraseña incorrectos" |
 | Estado | Pasa |
-| Evidencia | Corrida de pytest del 2026-11-26 |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Persona A |
 
 ## CP-RF02-04
@@ -248,7 +250,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | No se entrega token (401 o 422) |
 | Resultado obtenido | 422 sin token |
 | Estado | Pasa |
-| Evidencia | Corrida de pytest del 2026-11-26 |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Persona A |
 
 ## CP-RF02-05
@@ -268,7 +270,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | Con token: 200 con la cédula del usuario y sin campos sensibles. Sin token: 401 |
 | Resultado obtenido | 200 con el perfil propio; 401 sin token |
 | Estado | Pasa |
-| Evidencia | Corrida de pytest del 2026-11-26 |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (corrida del 2026-11-26) |
 | Responsable | Persona A |
 
 ## CP-RNF01-01
@@ -288,7 +290,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | El reset sin prueba de control de la cuenta se rechaza y la contraseña nueva no sirve para iniciar sesión. Con datos que no coinciden, el mismo error genérico para cédula inexistente y correo incorrecto |
 | Resultado obtenido | 204: la contraseña cambia y el atacante inicia sesión; la original deja de funcionar. Con datos erróneos, 400 con el mismo mensaje en ambos casos |
 | Estado | Falla; confirma el hallazgo 27 |
-| Evidencia | Corrida de pytest del 2026-11-26; detalle en `tests/auth-seguridad/security/verificaciones.md` |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Persona A |
 
 ## CP-RNF01-02
@@ -308,7 +310,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | `GET /users/me` con cada token: 401, sin datos del perfil ni detalles de configuración |
 | Resultado obtenido | Ningún token da acceso, pero los 5 responden 503 "SUPABASE_URL y SUPABASE_ANON_KEY deben estar configurados" |
 | Estado | Pasa en el acceso; falla en la respuesta (hallazgo 29) |
-| Evidencia | Corrida de pytest del 2026-11-26; detalle en `tests/auth-seguridad/security/verificaciones.md` |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Persona A |
 
 ## CP-RNF01-03
@@ -328,7 +330,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | GET, PUT y DELETE de la zona ajena: 404 y la zona intacta. Detalle y proveedores de la recomendación ajena: 404; historial vacío. Stream de progreso sin token: 401 |
 | Resultado obtenido | Zonas y recomendaciones protegidas como se esperaba. El stream responde 200 sin token con el estado de la recomendación |
 | Estado | Pasa en zonas y recomendaciones; falla en el stream (hallazgo 28) |
-| Evidencia | Corrida de pytest del 2026-11-26; detalle en `tests/auth-seguridad/security/verificaciones.md` |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Persona A |
 
 ## CP-RNF01-04
@@ -348,7 +350,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | El `user_id` del cuerpo no asigna la zona a otra persona. Campo desconocido y tipos incorrectos: 422. El frontend no inserta HTML sin escapar |
 | Resultado obtenido | El `user_id` se ignora. Campo desconocido: 201. Nombre numérico y latitud de texto: 500 con traceback. El frontend no usa `dangerouslySetInnerHTML` ni `innerHTML` |
 | Estado | Falla en la validación (hallazgo 15); pasa en asignación y escape |
-| Evidencia | Corrida de pytest del 2026-11-26; detalle en `tests/auth-seguridad/security/verificaciones.md` |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Persona A |
 
 ## CP-RNF01-05
@@ -368,7 +370,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | 500 con un mensaje genérico, sin `Traceback`, rutas de archivos ni `site-packages` |
 | Resultado obtenido | 500 con el traceback completo de Python y rutas del servidor |
 | Estado | Falla; confirma el hallazgo 14 |
-| Evidencia | Corrida de pytest del 2026-11-26; detalle en `tests/auth-seguridad/security/verificaciones.md` |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Persona A |
 
 ## CP-RNF01-06
@@ -388,5 +390,45 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado esperado | Antes del intento 30 aparece una respuesta 429 o 423, o un bloqueo temporal |
 | Resultado obtenido | Los 30 intentos responden 401, unos 4 por segundo; después la contraseña correcta sigue funcionando |
 | Estado | Falla; nuevo hallazgo 30 |
-| Evidencia | Corrida de pytest del 2026-11-26; detalle en `tests/auth-seguridad/security/verificaciones.md` |
+| Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
+| Responsable | Persona A |
+
+## CP-RNF04-01
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RNF04-01 |
+| Nombre | Carga de autenticación y lectura (PERF-01) |
+| Objetivo | Verificar que el login y las lecturas mantienen tiempos aceptables con 20 sesiones simultáneas |
+| Requerimiento asociado | RNF-04, criterio 3 |
+| Tipo y nivel de prueba | Rendimiento (carga), sistema (API del ambiente QA local) |
+| Prioridad | Media |
+| Característica 25010 que evidencia | Eficiencia de desempeño (comportamiento temporal, capacidad) |
+| Precondiciones | Ambiente QA local arriba; 20 usuarios sintéticos creados en el `setup` del escenario |
+| Datos de prueba | Rampa de 30 s hasta 20 usuarios virtuales, 1 min sostenido; cada iteración hace login, `GET /users/me`, `GET /catalogs/crops` y `GET /zones` con 1 s de pausa |
+| Pasos, o nombre de la prueba automatizada | `tests/auth-seguridad/performance/auth_read_load.js`, con `run_k6.sh auth_read_load.js perf-01`; diagnóstico con `event_loop_check.py` |
+| Resultado esperado | Umbrales declarados en `plan-calidad.md`: menos de 1% de fallos, p95 del login menor a 1000 ms, p95 de lecturas menor a 500 ms, más de 99% de verificaciones |
+| Resultado obtenido | 0% de fallos y 100% de verificaciones, pero p95 del login de 5120 ms y p95 de lecturas de 2060 ms. El diagnóstico muestra que una lectura pasa de 10 ms a 2403 ms durante 10 logins simultáneos |
+| Estado | Falla (2 de 4 umbrales); nuevo hallazgo 31 |
+| Evidencia | `reports/k6/perf-01.txt`, `reports/k6/perf-01.json`, `reports/k6/perf-01-diagnostico.txt` |
+| Responsable | Persona A |
+
+## CP-RNF04-02
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RNF04-02 |
+| Nombre | Recomendaciones simultáneas (PERF-02) |
+| Objetivo | Verificar que varias personas pueden pedir recomendaciones a la vez y recibirlas en el tiempo documentado |
+| Requerimiento asociado | RNF-04, criterios 1 y 2; RNF-03, criterio 1 |
+| Tipo y nivel de prueba | Rendimiento (carga), sistema (API del ambiente QA local) |
+| Prioridad | Alta |
+| Característica 25010 que evidencia | Eficiencia de desempeño (comportamiento temporal, capacidad); Fiabilidad (disponibilidad) |
+| Precondiciones | Ambiente QA local arriba; 10 usuarios sintéticos con sesión creados en el `setup`; LLM falso con 0 ms y luego con 3000 ms de latencia por llamada |
+| Datos de prueba | 10 usuarios virtuales, 2 solicitudes cada uno (20 en total), Tomate con Plagas; consulta del estado cada 2 s hasta `COMPLETED` o `FAILED` |
+| Pasos, o nombre de la prueba automatizada | `tests/auth-seguridad/performance/recommendation_load.js`, con `run_k6.sh recommendation_load.js perf-02-delay-0` y `perf-02-delay-3000` |
+| Resultado esperado | p95 de la solicitud menor a 1000 ms; p95 de solicitud a resultado de 50 s o menos; 100% en `COMPLETED` |
+| Resultado obtenido | Sin latencia: 837 ms, 5.6 s y 100%, cumple los tres. Con 3 s por llamada: 704 ms y 100%, pero p95 de solicitud a resultado de 94 s (una sola tarda 11 s; las demás esperan en cola) |
+| Estado | Pasa sin latencia; falla con latencia (1 de 3 umbrales); nuevo hallazgo 32 |
+| Evidencia | `reports/k6/perf-02-delay-0.txt` y `.json`, `reports/k6/perf-02-delay-3000.txt` y `.json` |
 | Responsable | Persona A |

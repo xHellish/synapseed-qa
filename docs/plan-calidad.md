@@ -45,6 +45,33 @@ Cada exclusión se justifica por riesgo.
 
 ## Objetivos de calidad
 
+### Umbrales de desempeño (RNF-04)
+
+Declarados el 2026-11-26, antes de la primera corrida de k6. La documentación de SynapSeed solo fija que el pipeline entrega en 10 a 50 s (MVP 4.1) y que la solicitud responde sin esperar al pipeline. El resto se fija aquí con estos criterios:
+
+- La población meta es un piloto regional de personas agricultoras: pocas decenas de sesiones a la vez, no miles.
+- La lectura de datos debe sentirse inmediata: menos de 0.5 s, la referencia habitual para respuestas de API interactivas.
+- El login usa bcrypt, que es lento a propósito, así que tiene más margen.
+
+Los escenarios corren en el ambiente QA local con el LLM falso, así que miden la capacidad del sistema y no la del proveedor del LLM.
+
+| Escenario | Carga | Métrica | Umbral | Fuente |
+|-----------|-------|---------|--------|--------|
+| PERF-01 Autenticación y lectura (`auth_read_load.js`) | Rampa hasta 20 usuarios virtuales, 1 min sostenido. Cada iteración: login, perfil, catálogo de cultivos y zonas, con 1 s de pausa | Peticiones fallidas | Menos de 1% | Plan |
+| | | p95 del login | Menos de 1000 ms | Plan |
+| | | p95 de las lecturas (perfil, catálogo, zonas) | Menos de 500 ms | Plan |
+| | | Verificaciones de contenido que pasan | Más de 99% | Plan |
+| PERF-02 Recomendaciones simultáneas (`recommendation_load.js`) | 10 usuarios virtuales que piden 2 recomendaciones cada uno (20 en total) y consultan el estado cada 2 s hasta el final | p95 de `POST /recommendations/request` | Menos de 1000 ms | RNF-04, criterio 2 |
+| | | p95 del tiempo de solicitud a resultado | 50 s o menos | RNF-04, criterio 1 (MVP: 10 a 50 s) |
+| | | Recomendaciones que terminan en `COMPLETED` | 100% | RNF-03, criterio 1 |
+
+PERF-02 se corre dos veces:
+
+- **LLM sin latencia** (`FAKE_LLM_DELAY_MS=0`): mide el costo propio del sistema, es decir, la cola, la base de datos y el pipeline.
+- **LLM con 3 s por llamada** (`FAKE_LLM_DELAY_MS=3000`): se acerca a un proveedor real, sin llegar a los 103 s medidos con OpenRouter (hallazgo 21).
+
+Los umbrales son los mismos en las dos corridas.
+
 ## Estrategia de pruebas
 
 ## Tipos y niveles de prueba
@@ -70,9 +97,9 @@ Ver `gqm-metricas.md`.
 
 | Persona | Área | Requerimientos | Otros frentes |
 |---------|------|----------------|---------------|
-| Persona A | Auth y seguridad | RF-01, RF-02, RNF-01 | Ambiente QA local, seguridad, carga, plan de calidad |
+| Persona A | Auth y seguridad | RF-01, RF-02, RNF-01, RNF-04 | Ambiente QA local, seguridad, carga, plan de calidad |
 | Persona B | Zonas y catálogos | RF-03, RF-04, RNF-02 | Revisión de requisitos, inspección, estáticas, deuda técnica, WCAG, GQM, informe |
-| Persona C | Recomendación | RF-05, RF-06, RNF-03 | Playwright, UAT, usabilidad, defectos, matriz |
+| Persona C | Recomendación | RF-05, RF-06, RNF-03, RNF-05 | Playwright, UAT, usabilidad, defectos, matriz |
 
 ## Herramientas
 

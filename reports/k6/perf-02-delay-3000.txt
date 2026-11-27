@@ -1,0 +1,647 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: /scripts/recommendation_load.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 10 max VUs, 25m30s max duration (incl. graceful stop):
+              * concurrent_recommendations: 2 iterations for each of 10 VUs (maxDuration: 25m0s, gracefulStop: 30s)
+
+
+Run                          [ 100% ] setup()
+concurrent_recommendations   [   0% ]
+
+Run                          [ 100% ] setup()
+concurrent_recommendations   [   0% ]
+
+Run                          [ 100% ] setup()
+concurrent_recommendations   [   0% ]
+
+Run                          [ 100% ] setup()
+concurrent_recommendations   [   0% ]
+
+Run                          [ 100% ] setup()
+concurrent_recommendations   [   0% ]
+
+running (00m06.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m01.0s/25m0s  00/20 iters, 2 per VU
+
+running (00m07.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m02.0s/25m0s  00/20 iters, 2 per VU
+
+running (00m08.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m03.0s/25m0s  00/20 iters, 2 per VU
+
+running (00m09.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m04.0s/25m0s  00/20 iters, 2 per VU
+
+running (00m10.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m05.0s/25m0s  00/20 iters, 2 per VU
+
+running (00m11.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m06.0s/25m0s  00/20 iters, 2 per VU
+
+running (00m12.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m07.0s/25m0s  00/20 iters, 2 per VU
+
+running (00m13.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m08.0s/25m0s  00/20 iters, 2 per VU
+
+running (00m14.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m09.0s/25m0s  00/20 iters, 2 per VU
+
+running (00m15.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m10.0s/25m0s  00/20 iters, 2 per VU
+
+running (00m16.0s), 10/10 VUs, 0 complete and 0 interrupted iterations
+concurrent_recommendations   [   0% ] 10 VUs  00m11.0s/25m0s  00/20 iters, 2 per VU
+
+running (00m17.0s), 10/10 VUs, 1 complete and 0 interrupted iterations
+concurrent_recommendations   [   5% ] 10 VUs  00m12.0s/25m0s  01/20 iters, 2 per VU
+
+running (00m18.0s), 10/10 VUs, 1 complete and 0 interrupted iterations
+concurrent_recommendations   [   5% ] 10 VUs  00m13.0s/25m0s  01/20 iters, 2 per VU
+
+running (00m19.0s), 10/10 VUs, 1 complete and 0 interrupted iterations
+concurrent_recommendations   [   5% ] 10 VUs  00m14.0s/25m0s  01/20 iters, 2 per VU
+
+running (00m20.0s), 10/10 VUs, 1 complete and 0 interrupted iterations
+concurrent_recommendations   [   5% ] 10 VUs  00m15.0s/25m0s  01/20 iters, 2 per VU
+
+running (00m21.0s), 10/10 VUs, 1 complete and 0 interrupted iterations
+concurrent_recommendations   [   5% ] 10 VUs  00m16.0s/25m0s  01/20 iters, 2 per VU
+
+running (00m22.0s), 10/10 VUs, 1 complete and 0 interrupted iterations
+concurrent_recommendations   [   5% ] 10 VUs  00m17.0s/25m0s  01/20 iters, 2 per VU
+
+running (00m23.0s), 10/10 VUs, 1 complete and 0 interrupted iterations
+concurrent_recommendations   [   5% ] 10 VUs  00m18.0s/25m0s  01/20 iters, 2 per VU
+
+running (00m24.0s), 10/10 VUs, 1 complete and 0 interrupted iterations
+concurrent_recommendations   [   5% ] 10 VUs  00m19.0s/25m0s  01/20 iters, 2 per VU
+
+running (00m25.0s), 10/10 VUs, 1 complete and 0 interrupted iterations
+concurrent_recommendations   [   5% ] 10 VUs  00m20.0s/25m0s  01/20 iters, 2 per VU
+
+running (00m26.0s), 10/10 VUs, 1 complete and 0 interrupted iterations
+concurrent_recommendations   [   5% ] 10 VUs  00m21.0s/25m0s  01/20 iters, 2 per VU
+
+running (00m27.0s), 10/10 VUs, 2 complete and 0 interrupted iterations
+concurrent_recommendations   [  10% ] 10 VUs  00m22.0s/25m0s  02/20 iters, 2 per VU
+
+running (00m28.0s), 10/10 VUs, 2 complete and 0 interrupted iterations
+concurrent_recommendations   [  10% ] 10 VUs  00m23.0s/25m0s  02/20 iters, 2 per VU
+
+running (00m29.0s), 10/10 VUs, 2 complete and 0 interrupted iterations
+concurrent_recommendations   [  10% ] 10 VUs  00m24.0s/25m0s  02/20 iters, 2 per VU
+
+running (00m30.0s), 10/10 VUs, 2 complete and 0 interrupted iterations
+concurrent_recommendations   [  10% ] 10 VUs  00m25.0s/25m0s  02/20 iters, 2 per VU
+
+running (00m31.0s), 10/10 VUs, 2 complete and 0 interrupted iterations
+concurrent_recommendations   [  10% ] 10 VUs  00m26.0s/25m0s  02/20 iters, 2 per VU
+
+running (00m32.0s), 10/10 VUs, 2 complete and 0 interrupted iterations
+concurrent_recommendations   [  10% ] 10 VUs  00m27.0s/25m0s  02/20 iters, 2 per VU
+
+running (00m33.0s), 10/10 VUs, 2 complete and 0 interrupted iterations
+concurrent_recommendations   [  10% ] 10 VUs  00m28.0s/25m0s  02/20 iters, 2 per VU
+
+running (00m34.0s), 10/10 VUs, 2 complete and 0 interrupted iterations
+concurrent_recommendations   [  10% ] 10 VUs  00m29.0s/25m0s  02/20 iters, 2 per VU
+
+running (00m35.0s), 10/10 VUs, 3 complete and 0 interrupted iterations
+concurrent_recommendations   [  15% ] 10 VUs  00m30.0s/25m0s  03/20 iters, 2 per VU
+
+running (00m36.0s), 10/10 VUs, 3 complete and 0 interrupted iterations
+concurrent_recommendations   [  15% ] 10 VUs  00m31.0s/25m0s  03/20 iters, 2 per VU
+
+running (00m37.0s), 10/10 VUs, 3 complete and 0 interrupted iterations
+concurrent_recommendations   [  15% ] 10 VUs  00m32.0s/25m0s  03/20 iters, 2 per VU
+
+running (00m38.0s), 10/10 VUs, 3 complete and 0 interrupted iterations
+concurrent_recommendations   [  15% ] 10 VUs  00m33.0s/25m0s  03/20 iters, 2 per VU
+
+running (00m39.0s), 10/10 VUs, 3 complete and 0 interrupted iterations
+concurrent_recommendations   [  15% ] 10 VUs  00m34.0s/25m0s  03/20 iters, 2 per VU
+
+running (00m40.0s), 10/10 VUs, 3 complete and 0 interrupted iterations
+concurrent_recommendations   [  15% ] 10 VUs  00m35.0s/25m0s  03/20 iters, 2 per VU
+
+running (00m41.0s), 10/10 VUs, 3 complete and 0 interrupted iterations
+concurrent_recommendations   [  15% ] 10 VUs  00m36.0s/25m0s  03/20 iters, 2 per VU
+
+running (00m42.0s), 10/10 VUs, 3 complete and 0 interrupted iterations
+concurrent_recommendations   [  15% ] 10 VUs  00m37.0s/25m0s  03/20 iters, 2 per VU
+
+running (00m43.0s), 10/10 VUs, 3 complete and 0 interrupted iterations
+concurrent_recommendations   [  15% ] 10 VUs  00m38.0s/25m0s  03/20 iters, 2 per VU
+
+running (00m44.0s), 10/10 VUs, 3 complete and 0 interrupted iterations
+concurrent_recommendations   [  15% ] 10 VUs  00m39.0s/25m0s  03/20 iters, 2 per VU
+
+running (00m45.0s), 10/10 VUs, 4 complete and 0 interrupted iterations
+concurrent_recommendations   [  20% ] 10 VUs  00m40.0s/25m0s  04/20 iters, 2 per VU
+
+running (00m46.0s), 10/10 VUs, 4 complete and 0 interrupted iterations
+concurrent_recommendations   [  20% ] 10 VUs  00m41.0s/25m0s  04/20 iters, 2 per VU
+
+running (00m47.0s), 10/10 VUs, 4 complete and 0 interrupted iterations
+concurrent_recommendations   [  20% ] 10 VUs  00m42.0s/25m0s  04/20 iters, 2 per VU
+
+running (00m48.0s), 10/10 VUs, 4 complete and 0 interrupted iterations
+concurrent_recommendations   [  20% ] 10 VUs  00m43.0s/25m0s  04/20 iters, 2 per VU
+
+running (00m49.0s), 10/10 VUs, 4 complete and 0 interrupted iterations
+concurrent_recommendations   [  20% ] 10 VUs  00m44.0s/25m0s  04/20 iters, 2 per VU
+
+running (00m50.0s), 10/10 VUs, 4 complete and 0 interrupted iterations
+concurrent_recommendations   [  20% ] 10 VUs  00m45.0s/25m0s  04/20 iters, 2 per VU
+
+running (00m51.0s), 10/10 VUs, 4 complete and 0 interrupted iterations
+concurrent_recommendations   [  20% ] 10 VUs  00m46.0s/25m0s  04/20 iters, 2 per VU
+
+running (00m52.0s), 10/10 VUs, 4 complete and 0 interrupted iterations
+concurrent_recommendations   [  20% ] 10 VUs  00m47.0s/25m0s  04/20 iters, 2 per VU
+
+running (00m53.0s), 10/10 VUs, 5 complete and 0 interrupted iterations
+concurrent_recommendations   [  25% ] 10 VUs  00m48.0s/25m0s  05/20 iters, 2 per VU
+
+running (00m54.0s), 10/10 VUs, 5 complete and 0 interrupted iterations
+concurrent_recommendations   [  25% ] 10 VUs  00m49.0s/25m0s  05/20 iters, 2 per VU
+
+running (00m55.0s), 10/10 VUs, 5 complete and 0 interrupted iterations
+concurrent_recommendations   [  25% ] 10 VUs  00m50.0s/25m0s  05/20 iters, 2 per VU
+
+running (00m56.0s), 10/10 VUs, 5 complete and 0 interrupted iterations
+concurrent_recommendations   [  25% ] 10 VUs  00m51.0s/25m0s  05/20 iters, 2 per VU
+
+running (00m57.0s), 10/10 VUs, 5 complete and 0 interrupted iterations
+concurrent_recommendations   [  25% ] 10 VUs  00m52.0s/25m0s  05/20 iters, 2 per VU
+
+running (00m58.0s), 10/10 VUs, 5 complete and 0 interrupted iterations
+concurrent_recommendations   [  25% ] 10 VUs  00m53.0s/25m0s  05/20 iters, 2 per VU
+
+running (00m59.0s), 10/10 VUs, 5 complete and 0 interrupted iterations
+concurrent_recommendations   [  25% ] 10 VUs  00m54.0s/25m0s  05/20 iters, 2 per VU
+
+running (01m00.0s), 10/10 VUs, 5 complete and 0 interrupted iterations
+concurrent_recommendations   [  25% ] 10 VUs  00m55.0s/25m0s  05/20 iters, 2 per VU
+
+running (01m01.0s), 10/10 VUs, 5 complete and 0 interrupted iterations
+concurrent_recommendations   [  25% ] 10 VUs  00m56.0s/25m0s  05/20 iters, 2 per VU
+
+running (01m02.0s), 10/10 VUs, 5 complete and 0 interrupted iterations
+concurrent_recommendations   [  25% ] 10 VUs  00m57.0s/25m0s  05/20 iters, 2 per VU
+
+running (01m03.0s), 10/10 VUs, 6 complete and 0 interrupted iterations
+concurrent_recommendations   [  30% ] 10 VUs  00m58.0s/25m0s  06/20 iters, 2 per VU
+
+running (01m04.0s), 10/10 VUs, 6 complete and 0 interrupted iterations
+concurrent_recommendations   [  30% ] 10 VUs  00m59.0s/25m0s  06/20 iters, 2 per VU
+
+running (01m05.0s), 10/10 VUs, 6 complete and 0 interrupted iterations
+concurrent_recommendations   [  30% ] 10 VUs  01m00.0s/25m0s  06/20 iters, 2 per VU
+
+running (01m06.0s), 10/10 VUs, 6 complete and 0 interrupted iterations
+concurrent_recommendations   [  30% ] 10 VUs  01m01.0s/25m0s  06/20 iters, 2 per VU
+
+running (01m07.0s), 10/10 VUs, 6 complete and 0 interrupted iterations
+concurrent_recommendations   [  30% ] 10 VUs  01m02.0s/25m0s  06/20 iters, 2 per VU
+
+running (01m08.0s), 10/10 VUs, 6 complete and 0 interrupted iterations
+concurrent_recommendations   [  30% ] 10 VUs  01m03.0s/25m0s  06/20 iters, 2 per VU
+
+running (01m09.0s), 10/10 VUs, 6 complete and 0 interrupted iterations
+concurrent_recommendations   [  30% ] 10 VUs  01m04.0s/25m0s  06/20 iters, 2 per VU
+
+running (01m10.0s), 10/10 VUs, 6 complete and 0 interrupted iterations
+concurrent_recommendations   [  30% ] 10 VUs  01m05.0s/25m0s  06/20 iters, 2 per VU
+
+running (01m11.0s), 10/10 VUs, 6 complete and 0 interrupted iterations
+concurrent_recommendations   [  30% ] 10 VUs  01m06.0s/25m0s  06/20 iters, 2 per VU
+
+running (01m12.0s), 10/10 VUs, 6 complete and 0 interrupted iterations
+concurrent_recommendations   [  30% ] 10 VUs  01m07.0s/25m0s  06/20 iters, 2 per VU
+
+running (01m13.0s), 10/10 VUs, 7 complete and 0 interrupted iterations
+concurrent_recommendations   [  35% ] 10 VUs  01m08.0s/25m0s  07/20 iters, 2 per VU
+
+running (01m14.0s), 10/10 VUs, 7 complete and 0 interrupted iterations
+concurrent_recommendations   [  35% ] 10 VUs  01m09.0s/25m0s  07/20 iters, 2 per VU
+
+running (01m15.0s), 10/10 VUs, 7 complete and 0 interrupted iterations
+concurrent_recommendations   [  35% ] 10 VUs  01m10.0s/25m0s  07/20 iters, 2 per VU
+
+running (01m16.0s), 10/10 VUs, 7 complete and 0 interrupted iterations
+concurrent_recommendations   [  35% ] 10 VUs  01m11.0s/25m0s  07/20 iters, 2 per VU
+
+running (01m17.0s), 10/10 VUs, 7 complete and 0 interrupted iterations
+concurrent_recommendations   [  35% ] 10 VUs  01m12.0s/25m0s  07/20 iters, 2 per VU
+
+running (01m18.0s), 10/10 VUs, 7 complete and 0 interrupted iterations
+concurrent_recommendations   [  35% ] 10 VUs  01m13.0s/25m0s  07/20 iters, 2 per VU
+
+running (01m19.0s), 10/10 VUs, 7 complete and 0 interrupted iterations
+concurrent_recommendations   [  35% ] 10 VUs  01m14.0s/25m0s  07/20 iters, 2 per VU
+
+running (01m20.0s), 10/10 VUs, 7 complete and 0 interrupted iterations
+concurrent_recommendations   [  35% ] 10 VUs  01m15.0s/25m0s  07/20 iters, 2 per VU
+
+running (01m21.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  01m16.0s/25m0s  08/20 iters, 2 per VU
+
+running (01m22.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  01m17.0s/25m0s  08/20 iters, 2 per VU
+
+running (01m23.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  01m18.0s/25m0s  08/20 iters, 2 per VU
+
+running (01m24.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  01m19.0s/25m0s  08/20 iters, 2 per VU
+
+running (01m25.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  01m20.0s/25m0s  08/20 iters, 2 per VU
+
+running (01m26.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  01m21.0s/25m0s  08/20 iters, 2 per VU
+
+running (01m27.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  01m22.0s/25m0s  08/20 iters, 2 per VU
+
+running (01m28.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  01m23.0s/25m0s  08/20 iters, 2 per VU
+
+running (01m29.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  01m24.0s/25m0s  08/20 iters, 2 per VU
+
+running (01m30.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  01m25.0s/25m0s  08/20 iters, 2 per VU
+
+running (01m31.0s), 10/10 VUs, 8 complete and 0 interrupted iterations
+concurrent_recommendations   [  40% ] 10 VUs  01m26.0s/25m0s  08/20 iters, 2 per VU
+
+running (01m32.0s), 10/10 VUs, 9 complete and 0 interrupted iterations
+concurrent_recommendations   [  45% ] 10 VUs  01m27.0s/25m0s  09/20 iters, 2 per VU
+
+running (01m33.0s), 10/10 VUs, 9 complete and 0 interrupted iterations
+concurrent_recommendations   [  45% ] 10 VUs  01m28.0s/25m0s  09/20 iters, 2 per VU
+
+running (01m34.0s), 10/10 VUs, 9 complete and 0 interrupted iterations
+concurrent_recommendations   [  45% ] 10 VUs  01m29.0s/25m0s  09/20 iters, 2 per VU
+
+running (01m35.0s), 10/10 VUs, 9 complete and 0 interrupted iterations
+concurrent_recommendations   [  45% ] 10 VUs  01m30.0s/25m0s  09/20 iters, 2 per VU
+
+running (01m36.0s), 10/10 VUs, 9 complete and 0 interrupted iterations
+concurrent_recommendations   [  45% ] 10 VUs  01m31.0s/25m0s  09/20 iters, 2 per VU
+
+running (01m37.0s), 10/10 VUs, 9 complete and 0 interrupted iterations
+concurrent_recommendations   [  45% ] 10 VUs  01m32.0s/25m0s  09/20 iters, 2 per VU
+
+running (01m38.0s), 10/10 VUs, 9 complete and 0 interrupted iterations
+concurrent_recommendations   [  45% ] 10 VUs  01m33.0s/25m0s  09/20 iters, 2 per VU
+
+running (01m39.0s), 10/10 VUs, 10 complete and 0 interrupted iterations
+concurrent_recommendations   [  50% ] 10 VUs  01m34.0s/25m0s  10/20 iters, 2 per VU
+
+running (01m40.0s), 10/10 VUs, 10 complete and 0 interrupted iterations
+concurrent_recommendations   [  50% ] 10 VUs  01m35.0s/25m0s  10/20 iters, 2 per VU
+
+running (01m41.0s), 10/10 VUs, 10 complete and 0 interrupted iterations
+concurrent_recommendations   [  50% ] 10 VUs  01m36.0s/25m0s  10/20 iters, 2 per VU
+
+running (01m42.0s), 10/10 VUs, 10 complete and 0 interrupted iterations
+concurrent_recommendations   [  50% ] 10 VUs  01m37.0s/25m0s  10/20 iters, 2 per VU
+
+running (01m43.0s), 10/10 VUs, 10 complete and 0 interrupted iterations
+concurrent_recommendations   [  50% ] 10 VUs  01m38.0s/25m0s  10/20 iters, 2 per VU
+
+running (01m44.0s), 10/10 VUs, 10 complete and 0 interrupted iterations
+concurrent_recommendations   [  50% ] 10 VUs  01m39.0s/25m0s  10/20 iters, 2 per VU
+
+running (01m45.0s), 10/10 VUs, 10 complete and 0 interrupted iterations
+concurrent_recommendations   [  50% ] 10 VUs  01m40.0s/25m0s  10/20 iters, 2 per VU
+
+running (01m46.0s), 10/10 VUs, 10 complete and 0 interrupted iterations
+concurrent_recommendations   [  50% ] 10 VUs  01m41.0s/25m0s  10/20 iters, 2 per VU
+
+running (01m47.0s), 10/10 VUs, 10 complete and 0 interrupted iterations
+concurrent_recommendations   [  50% ] 10 VUs  01m42.0s/25m0s  10/20 iters, 2 per VU
+
+running (01m48.0s), 10/10 VUs, 10 complete and 0 interrupted iterations
+concurrent_recommendations   [  50% ] 10 VUs  01m43.0s/25m0s  10/20 iters, 2 per VU
+
+running (01m49.0s), 09/10 VUs, 11 complete and 0 interrupted iterations
+concurrent_recommendations   [  55% ] 10 VUs  01m44.0s/25m0s  11/20 iters, 2 per VU
+
+running (01m50.0s), 09/10 VUs, 11 complete and 0 interrupted iterations
+concurrent_recommendations   [  55% ] 10 VUs  01m45.0s/25m0s  11/20 iters, 2 per VU
+
+running (01m51.0s), 09/10 VUs, 11 complete and 0 interrupted iterations
+concurrent_recommendations   [  55% ] 10 VUs  01m46.0s/25m0s  11/20 iters, 2 per VU
+
+running (01m52.0s), 09/10 VUs, 11 complete and 0 interrupted iterations
+concurrent_recommendations   [  55% ] 10 VUs  01m47.0s/25m0s  11/20 iters, 2 per VU
+
+running (01m53.0s), 09/10 VUs, 11 complete and 0 interrupted iterations
+concurrent_recommendations   [  55% ] 10 VUs  01m48.0s/25m0s  11/20 iters, 2 per VU
+
+running (01m54.0s), 09/10 VUs, 11 complete and 0 interrupted iterations
+concurrent_recommendations   [  55% ] 10 VUs  01m49.0s/25m0s  11/20 iters, 2 per VU
+
+running (01m55.0s), 09/10 VUs, 11 complete and 0 interrupted iterations
+concurrent_recommendations   [  55% ] 10 VUs  01m50.0s/25m0s  11/20 iters, 2 per VU
+
+running (01m56.0s), 09/10 VUs, 11 complete and 0 interrupted iterations
+concurrent_recommendations   [  55% ] 10 VUs  01m51.0s/25m0s  11/20 iters, 2 per VU
+
+running (01m57.0s), 09/10 VUs, 11 complete and 0 interrupted iterations
+concurrent_recommendations   [  55% ] 10 VUs  01m52.0s/25m0s  11/20 iters, 2 per VU
+
+running (01m58.0s), 09/10 VUs, 11 complete and 0 interrupted iterations
+concurrent_recommendations   [  55% ] 10 VUs  01m53.0s/25m0s  11/20 iters, 2 per VU
+
+running (01m59.0s), 09/10 VUs, 11 complete and 0 interrupted iterations
+concurrent_recommendations   [  55% ] 10 VUs  01m54.0s/25m0s  11/20 iters, 2 per VU
+
+running (02m00.0s), 08/10 VUs, 12 complete and 0 interrupted iterations
+concurrent_recommendations   [  60% ] 10 VUs  01m55.0s/25m0s  12/20 iters, 2 per VU
+
+running (02m01.0s), 08/10 VUs, 12 complete and 0 interrupted iterations
+concurrent_recommendations   [  60% ] 10 VUs  01m56.0s/25m0s  12/20 iters, 2 per VU
+
+running (02m02.0s), 08/10 VUs, 12 complete and 0 interrupted iterations
+concurrent_recommendations   [  60% ] 10 VUs  01m57.0s/25m0s  12/20 iters, 2 per VU
+
+running (02m03.0s), 08/10 VUs, 12 complete and 0 interrupted iterations
+concurrent_recommendations   [  60% ] 10 VUs  01m58.0s/25m0s  12/20 iters, 2 per VU
+
+running (02m04.0s), 08/10 VUs, 12 complete and 0 interrupted iterations
+concurrent_recommendations   [  60% ] 10 VUs  01m59.0s/25m0s  12/20 iters, 2 per VU
+
+running (02m05.0s), 08/10 VUs, 12 complete and 0 interrupted iterations
+concurrent_recommendations   [  60% ] 10 VUs  02m00.0s/25m0s  12/20 iters, 2 per VU
+
+running (02m06.0s), 08/10 VUs, 12 complete and 0 interrupted iterations
+concurrent_recommendations   [  60% ] 10 VUs  02m01.0s/25m0s  12/20 iters, 2 per VU
+
+running (02m07.0s), 07/10 VUs, 13 complete and 0 interrupted iterations
+concurrent_recommendations   [  65% ] 10 VUs  02m02.0s/25m0s  13/20 iters, 2 per VU
+
+running (02m08.0s), 07/10 VUs, 13 complete and 0 interrupted iterations
+concurrent_recommendations   [  65% ] 10 VUs  02m03.0s/25m0s  13/20 iters, 2 per VU
+
+running (02m09.0s), 07/10 VUs, 13 complete and 0 interrupted iterations
+concurrent_recommendations   [  65% ] 10 VUs  02m04.0s/25m0s  13/20 iters, 2 per VU
+
+running (02m10.0s), 07/10 VUs, 13 complete and 0 interrupted iterations
+concurrent_recommendations   [  65% ] 10 VUs  02m05.0s/25m0s  13/20 iters, 2 per VU
+
+running (02m11.0s), 07/10 VUs, 13 complete and 0 interrupted iterations
+concurrent_recommendations   [  65% ] 10 VUs  02m06.0s/25m0s  13/20 iters, 2 per VU
+
+running (02m12.0s), 07/10 VUs, 13 complete and 0 interrupted iterations
+concurrent_recommendations   [  65% ] 10 VUs  02m07.0s/25m0s  13/20 iters, 2 per VU
+
+running (02m13.0s), 07/10 VUs, 13 complete and 0 interrupted iterations
+concurrent_recommendations   [  65% ] 10 VUs  02m08.0s/25m0s  13/20 iters, 2 per VU
+
+running (02m14.0s), 07/10 VUs, 13 complete and 0 interrupted iterations
+concurrent_recommendations   [  65% ] 10 VUs  02m09.0s/25m0s  13/20 iters, 2 per VU
+
+running (02m15.0s), 07/10 VUs, 13 complete and 0 interrupted iterations
+concurrent_recommendations   [  65% ] 10 VUs  02m10.0s/25m0s  13/20 iters, 2 per VU
+
+running (02m16.0s), 07/10 VUs, 13 complete and 0 interrupted iterations
+concurrent_recommendations   [  65% ] 10 VUs  02m11.0s/25m0s  13/20 iters, 2 per VU
+
+running (02m17.0s), 06/10 VUs, 14 complete and 0 interrupted iterations
+concurrent_recommendations   [  70% ] 10 VUs  02m12.0s/25m0s  14/20 iters, 2 per VU
+
+running (02m18.0s), 06/10 VUs, 14 complete and 0 interrupted iterations
+concurrent_recommendations   [  70% ] 10 VUs  02m13.0s/25m0s  14/20 iters, 2 per VU
+
+running (02m19.0s), 06/10 VUs, 14 complete and 0 interrupted iterations
+concurrent_recommendations   [  70% ] 10 VUs  02m14.0s/25m0s  14/20 iters, 2 per VU
+
+running (02m20.0s), 06/10 VUs, 14 complete and 0 interrupted iterations
+concurrent_recommendations   [  70% ] 10 VUs  02m15.0s/25m0s  14/20 iters, 2 per VU
+
+running (02m21.0s), 06/10 VUs, 14 complete and 0 interrupted iterations
+concurrent_recommendations   [  70% ] 10 VUs  02m16.0s/25m0s  14/20 iters, 2 per VU
+
+running (02m22.0s), 06/10 VUs, 14 complete and 0 interrupted iterations
+concurrent_recommendations   [  70% ] 10 VUs  02m17.0s/25m0s  14/20 iters, 2 per VU
+
+running (02m23.0s), 06/10 VUs, 14 complete and 0 interrupted iterations
+concurrent_recommendations   [  70% ] 10 VUs  02m18.0s/25m0s  14/20 iters, 2 per VU
+
+running (02m24.0s), 06/10 VUs, 14 complete and 0 interrupted iterations
+concurrent_recommendations   [  70% ] 10 VUs  02m19.0s/25m0s  14/20 iters, 2 per VU
+
+running (02m25.0s), 06/10 VUs, 14 complete and 0 interrupted iterations
+concurrent_recommendations   [  70% ] 10 VUs  02m20.0s/25m0s  14/20 iters, 2 per VU
+
+running (02m26.0s), 05/10 VUs, 15 complete and 0 interrupted iterations
+concurrent_recommendations   [  75% ] 10 VUs  02m21.0s/25m0s  15/20 iters, 2 per VU
+
+running (02m27.0s), 05/10 VUs, 15 complete and 0 interrupted iterations
+concurrent_recommendations   [  75% ] 10 VUs  02m22.0s/25m0s  15/20 iters, 2 per VU
+
+running (02m28.0s), 05/10 VUs, 15 complete and 0 interrupted iterations
+concurrent_recommendations   [  75% ] 10 VUs  02m23.0s/25m0s  15/20 iters, 2 per VU
+
+running (02m29.0s), 05/10 VUs, 15 complete and 0 interrupted iterations
+concurrent_recommendations   [  75% ] 10 VUs  02m24.0s/25m0s  15/20 iters, 2 per VU
+
+running (02m30.0s), 05/10 VUs, 15 complete and 0 interrupted iterations
+concurrent_recommendations   [  75% ] 10 VUs  02m25.0s/25m0s  15/20 iters, 2 per VU
+
+running (02m31.0s), 05/10 VUs, 15 complete and 0 interrupted iterations
+concurrent_recommendations   [  75% ] 10 VUs  02m26.0s/25m0s  15/20 iters, 2 per VU
+
+running (02m32.0s), 05/10 VUs, 15 complete and 0 interrupted iterations
+concurrent_recommendations   [  75% ] 10 VUs  02m27.0s/25m0s  15/20 iters, 2 per VU
+
+running (02m33.0s), 05/10 VUs, 15 complete and 0 interrupted iterations
+concurrent_recommendations   [  75% ] 10 VUs  02m28.0s/25m0s  15/20 iters, 2 per VU
+
+running (02m34.0s), 05/10 VUs, 15 complete and 0 interrupted iterations
+concurrent_recommendations   [  75% ] 10 VUs  02m29.0s/25m0s  15/20 iters, 2 per VU
+
+running (02m35.0s), 05/10 VUs, 15 complete and 0 interrupted iterations
+concurrent_recommendations   [  75% ] 10 VUs  02m30.0s/25m0s  15/20 iters, 2 per VU
+
+running (02m36.0s), 04/10 VUs, 16 complete and 0 interrupted iterations
+concurrent_recommendations   [  80% ] 10 VUs  02m31.0s/25m0s  16/20 iters, 2 per VU
+
+running (02m37.0s), 04/10 VUs, 16 complete and 0 interrupted iterations
+concurrent_recommendations   [  80% ] 10 VUs  02m32.0s/25m0s  16/20 iters, 2 per VU
+
+running (02m38.0s), 04/10 VUs, 16 complete and 0 interrupted iterations
+concurrent_recommendations   [  80% ] 10 VUs  02m33.0s/25m0s  16/20 iters, 2 per VU
+
+running (02m39.0s), 04/10 VUs, 16 complete and 0 interrupted iterations
+concurrent_recommendations   [  80% ] 10 VUs  02m34.0s/25m0s  16/20 iters, 2 per VU
+
+running (02m40.0s), 04/10 VUs, 16 complete and 0 interrupted iterations
+concurrent_recommendations   [  80% ] 10 VUs  02m35.0s/25m0s  16/20 iters, 2 per VU
+
+running (02m41.0s), 04/10 VUs, 16 complete and 0 interrupted iterations
+concurrent_recommendations   [  80% ] 10 VUs  02m36.0s/25m0s  16/20 iters, 2 per VU
+
+running (02m42.0s), 04/10 VUs, 16 complete and 0 interrupted iterations
+concurrent_recommendations   [  80% ] 10 VUs  02m37.0s/25m0s  16/20 iters, 2 per VU
+
+running (02m43.0s), 04/10 VUs, 16 complete and 0 interrupted iterations
+concurrent_recommendations   [  80% ] 10 VUs  02m38.0s/25m0s  16/20 iters, 2 per VU
+
+running (02m44.0s), 04/10 VUs, 16 complete and 0 interrupted iterations
+concurrent_recommendations   [  80% ] 10 VUs  02m39.0s/25m0s  16/20 iters, 2 per VU
+
+running (02m45.0s), 03/10 VUs, 17 complete and 0 interrupted iterations
+concurrent_recommendations   [  85% ] 10 VUs  02m40.0s/25m0s  17/20 iters, 2 per VU
+
+running (02m46.0s), 03/10 VUs, 17 complete and 0 interrupted iterations
+concurrent_recommendations   [  85% ] 10 VUs  02m41.0s/25m0s  17/20 iters, 2 per VU
+
+running (02m47.0s), 03/10 VUs, 17 complete and 0 interrupted iterations
+concurrent_recommendations   [  85% ] 10 VUs  02m42.0s/25m0s  17/20 iters, 2 per VU
+
+running (02m48.0s), 03/10 VUs, 17 complete and 0 interrupted iterations
+concurrent_recommendations   [  85% ] 10 VUs  02m43.0s/25m0s  17/20 iters, 2 per VU
+
+running (02m49.0s), 03/10 VUs, 17 complete and 0 interrupted iterations
+concurrent_recommendations   [  85% ] 10 VUs  02m44.0s/25m0s  17/20 iters, 2 per VU
+
+running (02m50.0s), 03/10 VUs, 17 complete and 0 interrupted iterations
+concurrent_recommendations   [  85% ] 10 VUs  02m45.0s/25m0s  17/20 iters, 2 per VU
+
+running (02m51.0s), 03/10 VUs, 17 complete and 0 interrupted iterations
+concurrent_recommendations   [  85% ] 10 VUs  02m46.0s/25m0s  17/20 iters, 2 per VU
+
+running (02m52.0s), 03/10 VUs, 17 complete and 0 interrupted iterations
+concurrent_recommendations   [  85% ] 10 VUs  02m47.0s/25m0s  17/20 iters, 2 per VU
+
+running (02m53.0s), 03/10 VUs, 17 complete and 0 interrupted iterations
+concurrent_recommendations   [  85% ] 10 VUs  02m48.0s/25m0s  17/20 iters, 2 per VU
+
+running (02m54.0s), 03/10 VUs, 17 complete and 0 interrupted iterations
+concurrent_recommendations   [  85% ] 10 VUs  02m49.0s/25m0s  17/20 iters, 2 per VU
+
+running (02m55.0s), 03/10 VUs, 17 complete and 0 interrupted iterations
+concurrent_recommendations   [  85% ] 10 VUs  02m50.0s/25m0s  17/20 iters, 2 per VU
+
+running (02m56.0s), 02/10 VUs, 18 complete and 0 interrupted iterations
+concurrent_recommendations   [  90% ] 10 VUs  02m51.0s/25m0s  18/20 iters, 2 per VU
+
+running (02m57.0s), 02/10 VUs, 18 complete and 0 interrupted iterations
+concurrent_recommendations   [  90% ] 10 VUs  02m52.0s/25m0s  18/20 iters, 2 per VU
+
+running (02m58.0s), 02/10 VUs, 18 complete and 0 interrupted iterations
+concurrent_recommendations   [  90% ] 10 VUs  02m53.0s/25m0s  18/20 iters, 2 per VU
+
+running (02m59.0s), 02/10 VUs, 18 complete and 0 interrupted iterations
+concurrent_recommendations   [  90% ] 10 VUs  02m54.0s/25m0s  18/20 iters, 2 per VU
+
+running (03m00.0s), 02/10 VUs, 18 complete and 0 interrupted iterations
+concurrent_recommendations   [  90% ] 10 VUs  02m55.0s/25m0s  18/20 iters, 2 per VU
+
+running (03m01.0s), 02/10 VUs, 18 complete and 0 interrupted iterations
+concurrent_recommendations   [  90% ] 10 VUs  02m56.0s/25m0s  18/20 iters, 2 per VU
+
+running (03m02.0s), 02/10 VUs, 18 complete and 0 interrupted iterations
+concurrent_recommendations   [  90% ] 10 VUs  02m57.0s/25m0s  18/20 iters, 2 per VU
+
+running (03m03.0s), 02/10 VUs, 18 complete and 0 interrupted iterations
+concurrent_recommendations   [  90% ] 10 VUs  02m58.0s/25m0s  18/20 iters, 2 per VU
+
+running (03m04.0s), 01/10 VUs, 19 complete and 0 interrupted iterations
+concurrent_recommendations   [  95% ] 10 VUs  02m59.0s/25m0s  19/20 iters, 2 per VU
+
+running (03m05.0s), 01/10 VUs, 19 complete and 0 interrupted iterations
+concurrent_recommendations   [  95% ] 10 VUs  03m00.0s/25m0s  19/20 iters, 2 per VU
+
+running (03m06.0s), 01/10 VUs, 19 complete and 0 interrupted iterations
+concurrent_recommendations   [  95% ] 10 VUs  03m01.0s/25m0s  19/20 iters, 2 per VU
+
+running (03m07.0s), 01/10 VUs, 19 complete and 0 interrupted iterations
+concurrent_recommendations   [  95% ] 10 VUs  03m02.0s/25m0s  19/20 iters, 2 per VU
+
+running (03m08.0s), 01/10 VUs, 19 complete and 0 interrupted iterations
+concurrent_recommendations   [  95% ] 10 VUs  03m03.0s/25m0s  19/20 iters, 2 per VU
+
+running (03m09.0s), 01/10 VUs, 19 complete and 0 interrupted iterations
+concurrent_recommendations   [  95% ] 10 VUs  03m04.0s/25m0s  19/20 iters, 2 per VU
+
+running (03m10.0s), 01/10 VUs, 19 complete and 0 interrupted iterations
+concurrent_recommendations   [  95% ] 10 VUs  03m05.0s/25m0s  19/20 iters, 2 per VU
+
+running (03m11.0s), 01/10 VUs, 19 complete and 0 interrupted iterations
+concurrent_recommendations   [  95% ] 10 VUs  03m06.0s/25m0s  19/20 iters, 2 per VU
+
+running (03m12.0s), 01/10 VUs, 19 complete and 0 interrupted iterations
+concurrent_recommendations   [  95% ] 10 VUs  03m07.0s/25m0s  19/20 iters, 2 per VU
+
+running (03m13.0s), 01/10 VUs, 19 complete and 0 interrupted iterations
+concurrent_recommendations   [  95% ] 10 VUs  03m08.0s/25m0s  19/20 iters, 2 per VU
+
+running (03m14.0s), 01/10 VUs, 19 complete and 0 interrupted iterations
+concurrent_recommendations   [  95% ] 10 VUs  03m09.0s/25m0s  19/20 iters, 2 per VU
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{endpoint:request}
+    ✓ 'p(95)<1000' p(95)=704.1ms
+
+    recommendation_completed
+    ✓ 'rate==1' rate=100.00%
+
+    recommendation_total_ms
+    ✗ 'p(95)<=50000' p(95)=1m34s
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......................: 60      0.309257/s
+    checks_succeeded...................: 100.00% 60 out of 60
+    checks_failed......................: 0.00%   0 out of 60
+
+    ✓ request 202
+    ✓ request returns id
+    ✓ recommendation completed
+
+    CUSTOM
+    recommendation_completed................................................: 100.00% 20 out of 20
+    recommendation_total_ms.................................................: avg=1m12s    min=10.96s med=1m31s    max=1m35s    p(90)=1m33s    p(95)=1m34s  
+
+    HTTP
+    http_req_duration.......................................................: avg=503.25ms min=70.8ms med=535.8ms  max=869.16ms p(90)=653.52ms p(95)=682.2ms
+      { endpoint:request }..................................................: avg=384.92ms min=70.8ms med=385.02ms max=704.67ms p(90)=697.51ms p(95)=704.1ms
+      { expected_response:true }............................................: avg=503.25ms min=70.8ms med=535.8ms  max=869.16ms p(90)=653.52ms p(95)=682.2ms
+    http_req_failed.........................................................: 0.00%   0 out of 616
+    http_reqs...............................................................: 616     3.175042/s
+
+    EXECUTION
+    iteration_duration......................................................: avg=1m12s    min=10.95s med=1m31s    max=1m35s    p(90)=1m33s    p(95)=1m34s  
+    iterations..............................................................: 20      0.103086/s
+    vus.....................................................................: 1       min=0        max=10
+    vus_max.................................................................: 10      min=10       max=10
+
+    NETWORK
+    data_received...........................................................: 306 kB  1.6 kB/s
+    data_sent...............................................................: 184 kB  947 B/s
+
+
+
+
+running (03m14.0s), 00/10 VUs, 20 complete and 0 interrupted iterations
+concurrent_recommendations ✓ [ 100% ] 10 VUs  03m09.0s/25m0s  20/20 iters, 2 per VU
+time="2026-11-27T05:22:35Z" level=error msg="thresholds on metrics 'recommendation_total_ms' have been crossed"

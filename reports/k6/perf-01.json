@@ -1,0 +1,281 @@
+{
+    "root_group": {
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "login 200": {
+                    "name": "login 200",
+                    "path": "::login 200",
+                    "id": "48b06dc5cde7f6ebb606ad7da726a2a5",
+                    "passes": 280,
+                    "fails": 0
+                },
+                "login returns token": {
+                    "name": "login returns token",
+                    "path": "::login returns token",
+                    "id": "78c4c109214e8b5bb2cd4dc9ec3b7320",
+                    "passes": 280,
+                    "fails": 0
+                },
+                "profile 200": {
+                    "fails": 0,
+                    "name": "profile 200",
+                    "path": "::profile 200",
+                    "id": "9f52ef4cafa7519a2e7f5081fdd8d670",
+                    "passes": 280
+                },
+                "profile is own": {
+                    "name": "profile is own",
+                    "path": "::profile is own",
+                    "id": "9a1e71a60e95f483810f56bffc386697",
+                    "passes": 280,
+                    "fails": 0
+                },
+                "crops 200": {
+                    "passes": 280,
+                    "fails": 0,
+                    "name": "crops 200",
+                    "path": "::crops 200",
+                    "id": "58519307e628d46f702e79f2bbda1dc3"
+                },
+                "crops not empty": {
+                    "path": "::crops not empty",
+                    "id": "5e5f43cfee2b054143cf5c2936c34498",
+                    "passes": 280,
+                    "fails": 0,
+                    "name": "crops not empty"
+                },
+                "zones 200": {
+                    "name": "zones 200",
+                    "path": "::zones 200",
+                    "id": "bd58219e61ce2389d64ac07e31912377",
+                    "passes": 280,
+                    "fails": 0
+                }
+            },
+        "name": "",
+        "path": ""
+    },
+    "metrics": {
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 1140,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0
+        },
+        "http_req_connecting": {
+            "min": 0,
+            "med": 0,
+            "max": 0.45956,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0.005990078947368421
+        },
+        "data_received": {
+            "count": 428360,
+            "rate": 3846.2218424781045
+        },
+        "iterations": {
+            "count": 280,
+            "rate": 2.514105228998668
+        },
+        "http_req_blocked": {
+            "med": 0.00533,
+            "max": 1.209856,
+            "p(90)": 0.008075000000000008,
+            "p(95)": 0.009722999999999999,
+            "avg": 0.014527917543859618,
+            "min": 0.00213
+        },
+        "vus": {
+            "value": 1,
+            "min": 0,
+            "max": 20
+        },
+        "vus_max": {
+            "value": 20,
+            "min": 20,
+            "max": 20
+        },
+        "http_req_duration": {
+            "p(90)": 4701.3406957,
+            "p(95)": 4831.030906749999,
+            "avg": 1251.8270698605256,
+            "min": 4.517339,
+            "med": 509.29742350000004,
+            "max": 5404.18694
+        },
+        "http_req_duration{kind:read}": {
+            "p(95)": 2064.9326655999894,
+            "avg": 574.3392249499993,
+            "min": 4.517339,
+            "med": 318.446742,
+            "max": 4943.197441,
+            "p(90)": 1026.5270418000002,
+            "thresholds": {
+                "p(95)<500": true
+            }
+        },
+        "http_req_waiting": {
+            "min": 4.351696,
+            "med": 509.1347395,
+            "max": 5404.007536,
+            "p(90)": 4701.1652951999995,
+            "p(95)": 4830.8570013,
+            "avg": 1251.6657297552601
+        },
+        "http_req_duration{expected_response:true}": {
+            "med": 509.29742350000004,
+            "max": 5404.18694,
+            "p(90)": 4701.3406957,
+            "p(95)": 4831.030906749999,
+            "avg": 1251.8270698605256,
+            "min": 4.517339
+        },
+        "data_sent": {
+            "count": 300300,
+            "rate": 2696.377858101071
+        },
+        "http_req_duration{endpoint:login}": {
+            "avg": 3355.8689761964265,
+            "min": 235.093048,
+            "med": 4429.957581000001,
+            "max": 5404.18694,
+            "p(90)": 4954.74095,
+            "p(95)": 5123.2618462,
+            "thresholds": {
+                "p(95)<1000": true
+            }
+        },
+        "http_req_sending": {
+            "med": 0.0202055,
+            "max": 0.154114,
+            "p(90)": 0.06038510000000002,
+            "p(95)": 0.07081849999999999,
+            "avg": 0.028961780701754335,
+            "min": 0.00828
+        },
+        "http_req_receiving": {
+            "avg": 0.13237832456140347,
+            "min": 0.02477,
+            "med": 0.117593,
+            "max": 0.9549,
+            "p(90)": 0.18416030000000008,
+            "p(95)": 0.22971029999999998
+        },
+        "checks": {
+            "passes": 1960,
+            "fails": 0,
+            "thresholds": {
+                "rate>0.99": false
+            },
+            "value": 1
+        },
+        "http_reqs": {
+            "count": 1140,
+            "rate": 10.235999860923148
+        },
+        "http_req_tls_handshaking": {
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0,
+            "min": 0
+        },
+        "iteration_duration": {
+            "min": 1307.518225,
+            "med": 6850.520648,
+            "max": 7818.987792,
+            "p(90)": 7220.968283,
+            "p(95)": 7519.15450855,
+            "avg": 6080.273517114288
+        }
+    },
+    "setup_data": {
+        "users": [
+            {
+                "password": "QaCarga-735958683",
+                "identification": "735958683"
+            },
+            {
+                "password": "QaCarga-710761461",
+                "identification": "710761461"
+            },
+            {
+                "identification": "744946909",
+                "password": "QaCarga-744946909"
+            },
+            {
+                "identification": "701887301",
+                "password": "QaCarga-701887301"
+            },
+            {
+                "identification": "796681293",
+                "password": "QaCarga-796681293"
+            },
+            {
+                "identification": "792971996",
+                "password": "QaCarga-792971996"
+            },
+            {
+                "identification": "706558913",
+                "password": "QaCarga-706558913"
+            },
+            {
+                "identification": "776023928",
+                "password": "QaCarga-776023928"
+            },
+            {
+                "identification": "771872791",
+                "password": "QaCarga-771872791"
+            },
+            {
+                "identification": "787386828",
+                "password": "QaCarga-787386828"
+            },
+            {
+                "identification": "797483043",
+                "password": "QaCarga-797483043"
+            },
+            {
+                "password": "QaCarga-798956507",
+                "identification": "798956507"
+            },
+            {
+                "identification": "792077556",
+                "password": "QaCarga-792077556"
+            },
+            {
+                "identification": "795350882",
+                "password": "QaCarga-795350882"
+            },
+            {
+                "identification": "736023454",
+                "password": "QaCarga-736023454"
+            },
+            {
+                "password": "QaCarga-758950052",
+                "identification": "758950052"
+            },
+            {
+                "identification": "782610904",
+                "password": "QaCarga-782610904"
+            },
+            {
+                "identification": "732175946",
+                "password": "QaCarga-732175946"
+            },
+            {
+                "identification": "720630246",
+                "password": "QaCarga-720630246"
+            },
+            {
+                "identification": "774983141",
+                "password": "QaCarga-774983141"
+            }
+        ]
+    }
+}
