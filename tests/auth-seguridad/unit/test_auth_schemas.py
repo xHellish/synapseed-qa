@@ -108,7 +108,7 @@ def test_cp_rf01_06_campo_obligatorio_ausente(missing_field):
 # Los dos esquemas de registro del backend deben aplicar las mismas reglas (hallazgo 17)
 @pytest.mark.xfail(
     strict=True,
-    reason="Hallazgo 17: RegisterRequest y UserRegister definen reglas distintas",
+    reason="DEF-A12, hallazgo 17: RegisterRequest y UserRegister definen reglas distintas",
 )
 @pytest.mark.parametrize("changes", CONSISTENCY_CASES)
 def test_cp_rf01_07_esquemas_de_registro_consistentes(changes):

@@ -138,8 +138,8 @@ Convenciones:
 - Los archivos compartidos (`tests/conftest.py`, `pytest.ini`, `tests/playwright.config.js`) se cambian solo avisando al equipo.
 - El nombre de cada prueba automatizada empieza con el ID de su caso, por ejemplo `test_cp_rf03_02_zona_sin_nombre`, para enlazarla en la matriz de trazabilidad.
 - Las colecciones de Postman van una por área en su carpeta `api/`.
-- Los documentos están en `docs/`; cada persona escribe sus casos en `docs/casos-prueba/casos-<A|B|C>.md`. En `defectos.md`, `matriz-trazabilidad.md` e `informe-final.md` cada quien edita solo sus filas o su sección.
-- La evidencia de cada corrida va a `reports/`.
+- Los documentos están en `docs/`; cada persona escribe sus casos en `docs/casos-prueba/casos-<A|B|C>.md`. En `defectos.md`, `matriz-trazabilidad.md` e `informe-final.md` cada quien edita solo sus filas o su sección. Los defectos usan IDs por persona (`DEF-A01`, `DEF-B01`, `DEF-C01`) y las escalas de severidad y prioridad definidas al inicio de `defectos.md`.
+- La evidencia de cada corrida va a `reports/`. Lo que se verifica a mano (por ejemplo, detener un servicio y observar la respuesta) se guarda como texto en `reports/manual/`.
 
 ## Variables de entorno
 

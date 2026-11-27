@@ -1,0 +1,15 @@
+Hallazgo 20 - Health check que no verifica Redis
+Fecha: 2026-11-27. Ambiente QA local (env/docker-compose.qa.yml). Usuario sintetico 900000001.
+Procedimiento: GET /api/v1/health y POST /api/v1/recommendations/request con Redis arriba,
+con Redis detenido (docker compose -f env/docker-compose.qa.yml stop redis) y de nuevo arriba.
+
+[redis up] GET /health -> 200 {"status":"ok","version":"0.1.0","env":"development","service":"synapseed-backend","checks":{"database":"ok","redis":"pending","gemini":"pending"}}
+[redis up] POST /recommendations/request -> 202 {"ticket_id":"325e350b-89e4-4102-b9fc-7e5da8acb720","recommendation_id":57,"status":"pending","message":"Recomendación encolada correctamente"}
+[redis stopped] GET /health -> 200 {"status":"ok","version":"0.1.0","env":"development","service":"synapseed-backend","checks":{"database":"ok","redis":"pending","gemini":"pending"}}
+[redis stopped] POST /recommendations/request -> 500 Traceback (most recent call last):
+[redis restarted] GET /health -> 200 {"status":"ok","version":"0.1.0","env":"development","service":"synapseed-backend","checks":{"database":"ok","redis":"pending","gemini":"pending"}}
+[redis restarted] POST /recommendations/request -> 202 {"ticket_id":"e62e501a-c930-4c46-a9f6-04fb46e6b863","recommendation_id":59,"status":"pending","message":"Recomendación encolada correctamente"}
+
+Conclusion: con Redis detenido el health check sigue respondiendo "status": "ok", mientras la
+solicitud de recomendacion falla con 500 y traceback. La Spec (Docs/Spec_validada.md, linea 110)
+define el health check como "DB + Redis + LLM API".

@@ -1,0 +1,17 @@
+Hallazgo 25 - El seed depende de archivos que no estan en el repo
+Fecha: 2026-11-27. Submodulo synapseed en el commit ec14b12.
+
+1. Rutas que lee app/db/seed.py:
+32:# Directorio de salida: raíz del proyecto (donde está output/)
+83:    """Carga productos desde plaguicidas.csv y fertilizantes.csv de manera eficiente."""
+337:    """Carga los límites máximos de residuos (LMR) desde lmr.csv."""
+453:        plaguicidas_path = OUTPUT_DIR / "plaguicidas.csv"
+460:        fertilizantes_path = OUTPUT_DIR / "fertilizantes.csv"
+476:        lmr_path = OUTPUT_DIR / "lmr.csv"
+
+2. La carpeta output/ en el repositorio:
+ls: cannot access 'output': No such file or directory
+ls: cannot access 'src/backend/output': No such file or directory
+
+3. Archivos CSV versionados en todo el repositorio:
+0 archivos .csv

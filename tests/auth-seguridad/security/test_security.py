@@ -114,7 +114,7 @@ def has_traceback(body):
 # Un tercero sin sesion no debe poder cambiar la contrasena de otra cuenta (hallazgo 27)
 @pytest.mark.xfail(
     strict=True,
-    reason="Hallazgo 27: reset-password cambia la contrasena con solo cedula y correo",
+    reason="DEF-A01, hallazgo 27: reset-password cambia la contrasena con solo cedula y correo",
 )
 def test_cp_rnf01_01_reset_sin_verificacion_no_toma_la_cuenta(api, make_session):
     victim = make_session()
@@ -184,7 +184,7 @@ def test_cp_rnf01_02_token_manipulado_no_da_acceso(
 # Un token manipulado se rechaza con 401 y sin detalles de configuracion (hallazgo 29)
 @pytest.mark.xfail(
     strict=True,
-    reason="Hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion",
+    reason="DEF-A11, hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion",
 )
 @pytest.mark.parametrize(
     "token_kind", ["alg_none", "payload_alterado", "secreto_ajeno", "vencido", "basura"]
@@ -248,7 +248,7 @@ def test_cp_rnf01_03_recomendacion_ajena_inaccesible(api, make_session):
 
 # El stream de progreso exige autenticacion (hallazgo 28)
 @pytest.mark.xfail(
-    strict=True, reason="Hallazgo 28: el stream SSE de progreso no exige token"
+    strict=True, reason="DEF-A10, hallazgo 28: el stream SSE de progreso no exige token"
 )
 def test_cp_rnf01_03_stream_de_progreso_exige_token(api, make_session):
     owner = make_session()
@@ -285,7 +285,7 @@ def test_cp_rnf01_04_user_id_del_cuerpo_se_ignora(api, make_session):
 # Campos desconocidos y tipos incorrectos se rechazan con 422 (hallazgo 15)
 @pytest.mark.xfail(
     strict=True,
-    reason="Hallazgo 15: zonas recibe un dict sin schema y acepta cualquier campo",
+    reason="DEF-A08, hallazgo 15: zonas recibe un dict sin schema y acepta cualquier campo",
 )
 @pytest.mark.parametrize(
     "changes",
@@ -317,7 +317,7 @@ def test_cp_rnf01_04_frontend_no_inserta_html_crudo():
 # Un error 500 no expone el traceback ni rutas internas (hallazgo 14)
 @pytest.mark.xfail(
     strict=True,
-    reason="Hallazgo 14: DEBUG=True por defecto devuelve el traceback en los 500",
+    reason="DEF-A02, hallazgo 14: DEBUG=True por defecto devuelve el traceback en los 500",
 )
 def test_cp_rnf01_05_error_500_sin_traceback(api, make_session):
     user = make_session()
@@ -337,7 +337,7 @@ def test_cp_rnf01_05_error_500_sin_traceback(api, make_session):
 # ---------------------------------------------
 # Tras muchos intentos fallidos seguidos, el login limita o bloquea (hallazgo 30)
 @pytest.mark.xfail(
-    strict=True, reason="Hallazgo 30: el login no limita los intentos fallidos"
+    strict=True, reason="DEF-A03, hallazgo 30: el login no limita los intentos fallidos"
 )
 def test_cp_rnf01_06_login_limita_intentos_fallidos(api, make_session):
     victim = make_session()

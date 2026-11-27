@@ -93,6 +93,25 @@ Encontrados el 2026-11-26 con k6 (`tests/auth-seguridad/performance/`) contra el
 
 32. **El pipeline atiende una recomendación a la vez, así que la meta de 10 a 50 s solo se cumple con una persona.** La Spec (línea 201) y `Dockerfile.worker` fijan el worker de Celery con `--concurrency=1`. En PERF-02, con el LLM falso a 3 s por llamada, una recomendación sola tarda 11 s, pero 20 solicitudes de 10 personas terminan con p95 de 94 s y la última a los 95 s: cada una espera a las anteriores. Con el LLM real (103 s medidos en el hallazgo 21), la décima persona en pedir esperaría más de 15 minutos. Es una contradicción entre dos decisiones de la Spec, la concurrencia de 1 y el tiempo de 10 a 50 s, más que un error de código. Evidencia: `reports/k6/perf-02-delay-3000.txt`.
 
+## Hallazgos formalizados como defectos
+
+Los hallazgos se formalizan en `docs/defectos.md`, con severidad, prioridad, pasos para reproducir y evidencia. Hallazgos de la Persona A:
+
+| Hallazgo | Defecto | Severidad |
+|----------|---------|-----------|
+| 27 | DEF-A01 | Crítica |
+| 14 | DEF-A02 | Alta |
+| 30 | DEF-A03 | Alta |
+| 26 | DEF-A04 | Alta |
+| 25 | DEF-A05 | Alta |
+| 31 | DEF-A06 | Alta |
+| 32 | DEF-A07 | Alta |
+| 15 | DEF-A08 | Media |
+| 20 | DEF-A09 | Media |
+| 28 | DEF-A10 | Media |
+| 29 | DEF-A11 | Baja |
+| 17 | DEF-A12 | Baja |
+
 ## Datos existentes en la base
 
 La base de Supabase no está vacía: trae 7 usuarios, 9 zonas, 55 recomendaciones y 3672 registros de auditoría de junio de 2026, además del catálogo cargado por el seed (13401 productos, 565 distribuidores, 8528 LMR, 5 regulaciones, ninguno con embeddings). Las reglas del proyecto exigen datos sintéticos; esos usuarios pueden contener datos personales reales y no deben usarse en las pruebas ni copiarse a la evidencia.

@@ -66,20 +66,20 @@ tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf02_04_login_con_correo
 
 - generated xml file: E:\Escritorio\Proyecto Integrado QA\synapseed-qa\reports\pytest\auth-seguridad.xml -
 =========================== short test summary info ===========================
-XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_01_reset_sin_verificacion_no_toma_la_cuenta - Hallazgo 27: reset-password cambia la contrasena con solo cedula y correo
-XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[alg_none] - Hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
-XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[payload_alterado] - Hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
-XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[secreto_ajeno] - Hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
-XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[vencido] - Hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
-XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[basura] - Hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
-XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_03_stream_de_progreso_exige_token - Hallazgo 28: el stream SSE de progreso no exige token
-XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza[campo_desconocido] - Hallazgo 15: zonas recibe un dict sin schema y acepta cualquier campo
-XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza[nombre_numerico] - Hallazgo 15: zonas recibe un dict sin schema y acepta cualquier campo
-XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza[latitud_texto] - Hallazgo 15: zonas recibe un dict sin schema y acepta cualquier campo
-XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_05_error_500_sin_traceback - Hallazgo 14: DEBUG=True por defecto devuelve el traceback en los 500
-XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_06_login_limita_intentos_fallidos - Hallazgo 30: el login no limita los intentos fallidos
-XFAIL tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes0] - Hallazgo 17: RegisterRequest y UserRegister definen reglas distintas
-XFAIL tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes1] - Hallazgo 17: RegisterRequest y UserRegister definen reglas distintas
-XFAIL tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes2] - Hallazgo 17: RegisterRequest y UserRegister definen reglas distintas
-XFAIL tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes3] - Hallazgo 17: RegisterRequest y UserRegister definen reglas distintas
-======================= 41 passed, 16 xfailed in 31.11s =======================
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_01_reset_sin_verificacion_no_toma_la_cuenta - DEF-A01, hallazgo 27: reset-password cambia la contrasena con solo cedula y correo
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[alg_none] - DEF-A11, hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[payload_alterado] - DEF-A11, hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[secreto_ajeno] - DEF-A11, hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[vencido] - DEF-A11, hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_02_token_manipulado_responde_401[basura] - DEF-A11, hallazgo 29: los tokens invalidos responden 503 con detalle de configuracion
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_03_stream_de_progreso_exige_token - DEF-A10, hallazgo 28: el stream SSE de progreso no exige token
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza[campo_desconocido] - DEF-A08, hallazgo 15: zonas recibe un dict sin schema y acepta cualquier campo
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza[nombre_numerico] - DEF-A08, hallazgo 15: zonas recibe un dict sin schema y acepta cualquier campo
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza[latitud_texto] - DEF-A08, hallazgo 15: zonas recibe un dict sin schema y acepta cualquier campo
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_05_error_500_sin_traceback - DEF-A02, hallazgo 14: DEBUG=True por defecto devuelve el traceback en los 500
+XFAIL tests/auth-seguridad/security/test_security.py::test_cp_rnf01_06_login_limita_intentos_fallidos - DEF-A03, hallazgo 30: el login no limita los intentos fallidos
+XFAIL tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes0] - DEF-A12, hallazgo 17: RegisterRequest y UserRegister definen reglas distintas
+XFAIL tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes1] - DEF-A12, hallazgo 17: RegisterRequest y UserRegister definen reglas distintas
+XFAIL tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes2] - DEF-A12, hallazgo 17: RegisterRequest y UserRegister definen reglas distintas
+XFAIL tests/auth-seguridad/unit/test_auth_schemas.py::test_cp_rf01_07_esquemas_de_registro_consistentes[changes3] - DEF-A12, hallazgo 17: RegisterRequest y UserRegister definen reglas distintas
+======================= 41 passed, 16 xfailed in 31.99s =======================

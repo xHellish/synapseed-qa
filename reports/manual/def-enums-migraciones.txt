@@ -1,0 +1,21 @@
+Hallazgo 26 - Enums incompatibles entre migraciones y modelos
+Fecha: 2026-11-27. Postgres del ambiente QA local, en una base temporal (enum_check) creada
+solo con "alembic upgrade head", sin env/align_enums.py. La base se borro al terminar.
+
+1. Etiquetas que crean las migraciones:
+
+ regulationtype                                    | recommendation_status                 | product_category
+---------------------------------------------------+---------------------------------------+---------------------------
+ {decreto,ley,resolucion,lista_prohibida,lmr,otro} | {pending,processing,completed,failed} | {plaguicida,fertilizante}
+
+2. Valores que escribe el ORM (SQLEnum sin values_callable guarda el nombre del miembro):
+
+ORM RegulationType names: ['DECRETO', 'LEY', 'RESOLUCION', 'LISTA_PROHIBIDA', 'LMR', 'OTRO']
+ORM RecommendationStatus names: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED']
+
+3. La base acepta la etiqueta de la migracion y rechaza la del ORM:
+
+SELECT 'decreto'::regulationtype;   -> decreto
+SELECT 'DECRETO'::regulationtype;   -> ERROR:  invalid input value for enum regulationtype: "DECRETO"
+
+Es el mismo error con el que falla app/db/seed.py en una instalacion nueva (2026-11-26).

@@ -14,20 +14,20 @@ Los resultados esperados salen de los criterios de aceptación de `docs/requisit
 | CP-RF01-04 | Correo con formato inválido | RF-01 (4) | Partición de equivalencia, clases inválidas | Unitaria e integración | Pasa |
 | CP-RF01-05 | Contraseña almacenada con bcrypt | RF-01 (5), RNF-01 (3) | Verificación de efecto en base de datos | Integración | Pasa |
 | CP-RF01-06 | Campo obligatorio ausente | RF-01 (6) | Partición, un campo inválido por caso | Unitaria e integración | Pasa |
-| CP-RF01-07 | Reglas de registro consistentes | RF-01 (3, 6) | Valores límite comparados entre esquemas | Unitaria | Falla (hallazgo 17) |
+| CP-RF01-07 | Reglas de registro consistentes | RF-01 (3, 6) | Valores límite comparados entre esquemas | Unitaria | Falla (DEF-A12, hallazgo 17) |
 | CP-RF02-01 | Login con credenciales válidas | RF-02 (1) | Partición de equivalencia, clase válida | Integración | Pasa |
 | CP-RF02-02 | Expiración del JWT | RF-02 (2) | Verificación de valor configurado | Integración | Pasa |
 | CP-RF02-03 | Mismo rechazo para contraseña y cédula | RF-02 (3) | Partición, dos clases inválidas comparadas | Integración | Pasa |
 | CP-RF02-04 | Login con correo en vez de cédula | RF-02 (4) | Partición de equivalencia, clase inválida | Unitaria e integración | Pasa |
 | CP-RF02-05 | Perfil propio con y sin token | RF-02 (5), RNF-01 (1) | Partición: con token y sin token | Integración | Pasa |
-| CP-RNF01-01 (SEC-01) | Reset de contraseña sin verificación | RNF-01 (2) | Prueba de ataque: toma de cuenta | Seguridad | Falla (hallazgo 27) |
-| CP-RNF01-02 (SEC-02) | Tokens manipulados | RNF-01 (1, 7) | Partición: 5 clases de token inválido | Seguridad | Pasa con defecto (hallazgo 29) |
-| CP-RNF01-03 (SEC-03) | Acceso a datos de otra persona | RNF-01 (1, 2) | Prueba de ataque: IDOR con dos cuentas | Seguridad | Pasa con defecto (hallazgo 28) |
-| CP-RNF01-04 (SEC-04) | Validación de entrada en zonas | RNF-01 (5) | Partición: campo extra, tipo incorrecto, HTML | Seguridad | Falla (hallazgo 15) |
-| CP-RNF01-05 (SEC-05) | Detalles internos en errores | RNF-01 (7) | Adivinación de errores: provocar un 500 | Seguridad | Falla (hallazgo 14) |
-| CP-RNF01-06 (SEC-06) | Fuerza bruta en el login | RNF-01 (8) | Prueba de ataque: 30 intentos seguidos | Seguridad | Falla (hallazgo 30) |
-| CP-RNF04-01 (PERF-01) | Carga de autenticación y lectura | RNF-04 (3) | Prueba de carga con umbrales previos | Rendimiento | Falla (hallazgo 31) |
-| CP-RNF04-02 (PERF-02) | Recomendaciones simultáneas | RNF-04 (1, 2), RNF-03 (1) | Prueba de carga con umbrales previos | Rendimiento | Pasa sin latencia; falla con latencia (hallazgo 32) |
+| CP-RNF01-01 (SEC-01) | Reset de contraseña sin verificación | RNF-01 (2) | Prueba de ataque: toma de cuenta | Seguridad | Falla (DEF-A01, hallazgo 27) |
+| CP-RNF01-02 (SEC-02) | Tokens manipulados | RNF-01 (1, 7) | Partición: 5 clases de token inválido | Seguridad | Pasa con defecto (DEF-A11, hallazgo 29) |
+| CP-RNF01-03 (SEC-03) | Acceso a datos de otra persona | RNF-01 (1, 2) | Prueba de ataque: IDOR con dos cuentas | Seguridad | Pasa con defecto (DEF-A10, hallazgo 28) |
+| CP-RNF01-04 (SEC-04) | Validación de entrada en zonas | RNF-01 (5) | Partición: campo extra, tipo incorrecto, HTML | Seguridad | Falla (DEF-A08, hallazgo 15) |
+| CP-RNF01-05 (SEC-05) | Detalles internos en errores | RNF-01 (7) | Adivinación de errores: provocar un 500 | Seguridad | Falla (DEF-A02, hallazgo 14) |
+| CP-RNF01-06 (SEC-06) | Fuerza bruta en el login | RNF-01 (8) | Prueba de ataque: 30 intentos seguidos | Seguridad | Falla (DEF-A03, hallazgo 30) |
+| CP-RNF04-01 (PERF-01) | Carga de autenticación y lectura | RNF-04 (3) | Prueba de carga con umbrales previos | Rendimiento | Falla (DEF-A06, hallazgo 31) |
+| CP-RNF04-02 (PERF-02) | Recomendaciones simultáneas | RNF-04 (1, 2), RNF-03 (1) | Prueba de carga con umbrales previos | Rendimiento | Pasa sin latencia; falla con latencia (DEF-A07, hallazgo 32) |
 
 Ejecución: 2026-11-26 contra el ambiente QA local (`env/docker-compose.qa.yml`), con `synapseed\src\backend\.venv\Scripts\python -m pytest tests/auth-seguridad`. Resultado: 41 pruebas pasan y 16 fallan como se esperaba (`xfail`): 4 del hallazgo 17 y 12 de las verificaciones de seguridad. El detalle de los ataques está en `tests/auth-seguridad/security/verificaciones.md`. Los escenarios de carga se corren con k6 (`tests/auth-seguridad/performance/run_k6.sh`) y sus resultados están en `tests/auth-seguridad/performance/resultados.md`. La salida completa de cada corrida queda en `reports/`.
 
@@ -169,7 +169,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Pasos, o nombre de la prueba automatizada | `test_cp_rf01_07_esquemas_de_registro_consistentes` (4 valores, marcada `xfail` estricta) |
 | Resultado esperado | Ambos esquemas aceptan o rechazan los mismos datos |
 | Resultado obtenido | Los 4 valores se aceptan en `app/schemas/auth.py` (`RegisterRequest`: cédula de 5 o más, contraseña de 6 o más) y se rechazan en `app/schemas/user.py` (`UserRegister`: cédula de 9 a 12 dígitos, contraseña de 8 o más). El router usa `UserRegister`, así que hoy rige la regla más estricta, pero la duplicación deja dos fuentes de verdad |
-| Estado | Falla; confirma el hallazgo 17 |
+| Estado | Falla; confirma el hallazgo 17 (DEF-A12) |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml` (4 `XFAIL`) |
 | Responsable | Persona A |
 
@@ -289,7 +289,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_01_reset_sin_verificacion_no_toma_la_cuenta` (xfail), `test_cp_rnf01_01_reset_con_datos_erroneos_no_revela_la_cuenta` (`security/test_security.py`) |
 | Resultado esperado | El reset sin prueba de control de la cuenta se rechaza y la contraseña nueva no sirve para iniciar sesión. Con datos que no coinciden, el mismo error genérico para cédula inexistente y correo incorrecto |
 | Resultado obtenido | 204: la contraseña cambia y el atacante inicia sesión; la original deja de funcionar. Con datos erróneos, 400 con el mismo mensaje en ambos casos |
-| Estado | Falla; confirma el hallazgo 27 |
+| Estado | Falla; confirma el hallazgo 27 (DEF-A01) |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Persona A |
 
@@ -309,7 +309,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_02_token_manipulado_no_da_acceso` (5 valores), `test_cp_rnf01_02_token_manipulado_responde_401` (5 valores, xfail) |
 | Resultado esperado | `GET /users/me` con cada token: 401, sin datos del perfil ni detalles de configuración |
 | Resultado obtenido | Ningún token da acceso, pero los 5 responden 503 "SUPABASE_URL y SUPABASE_ANON_KEY deben estar configurados" |
-| Estado | Pasa en el acceso; falla en la respuesta (hallazgo 29) |
+| Estado | Pasa en el acceso; falla en la respuesta (DEF-A11, hallazgo 29) |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Persona A |
 
@@ -329,7 +329,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_03_zona_ajena_inaccesible`, `test_cp_rnf01_03_recomendacion_ajena_inaccesible`, `test_cp_rnf01_03_stream_de_progreso_exige_token` (xfail) |
 | Resultado esperado | GET, PUT y DELETE de la zona ajena: 404 y la zona intacta. Detalle y proveedores de la recomendación ajena: 404; historial vacío. Stream de progreso sin token: 401 |
 | Resultado obtenido | Zonas y recomendaciones protegidas como se esperaba. El stream responde 200 sin token con el estado de la recomendación |
-| Estado | Pasa en zonas y recomendaciones; falla en el stream (hallazgo 28) |
+| Estado | Pasa en zonas y recomendaciones; falla en el stream (DEF-A10, hallazgo 28) |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Persona A |
 
@@ -349,7 +349,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_04_user_id_del_cuerpo_se_ignora`, `test_cp_rnf01_04_entrada_invalida_en_zona_se_rechaza` (3 valores, xfail), `test_cp_rnf01_04_frontend_no_inserta_html_crudo` |
 | Resultado esperado | El `user_id` del cuerpo no asigna la zona a otra persona. Campo desconocido y tipos incorrectos: 422. El frontend no inserta HTML sin escapar |
 | Resultado obtenido | El `user_id` se ignora. Campo desconocido: 201. Nombre numérico y latitud de texto: 500 con traceback. El frontend no usa `dangerouslySetInnerHTML` ni `innerHTML` |
-| Estado | Falla en la validación (hallazgo 15); pasa en asignación y escape |
+| Estado | Falla en la validación (DEF-A08, hallazgo 15); pasa en asignación y escape |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Persona A |
 
@@ -369,7 +369,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_05_error_500_sin_traceback` (xfail) |
 | Resultado esperado | 500 con un mensaje genérico, sin `Traceback`, rutas de archivos ni `site-packages` |
 | Resultado obtenido | 500 con el traceback completo de Python y rutas del servidor |
-| Estado | Falla; confirma el hallazgo 14 |
+| Estado | Falla; confirma el hallazgo 14 (DEF-A02) |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Persona A |
 
@@ -389,7 +389,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Pasos, o nombre de la prueba automatizada | `test_cp_rnf01_06_login_limita_intentos_fallidos` (xfail) |
 | Resultado esperado | Antes del intento 30 aparece una respuesta 429 o 423, o un bloqueo temporal |
 | Resultado obtenido | Los 30 intentos responden 401, unos 4 por segundo; después la contraseña correcta sigue funcionando |
-| Estado | Falla; nuevo hallazgo 30 |
+| Estado | Falla; nuevo hallazgo 30 (DEF-A03) |
 | Evidencia | `reports/pytest/auth-seguridad.txt` y `.xml`; detalle en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Persona A |
 
@@ -409,7 +409,7 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Pasos, o nombre de la prueba automatizada | `tests/auth-seguridad/performance/auth_read_load.js`, con `run_k6.sh auth_read_load.js perf-01`; diagnóstico con `event_loop_check.py` |
 | Resultado esperado | Umbrales declarados en `plan-calidad.md`: menos de 1% de fallos, p95 del login menor a 1000 ms, p95 de lecturas menor a 500 ms, más de 99% de verificaciones |
 | Resultado obtenido | 0% de fallos y 100% de verificaciones, pero p95 del login de 5120 ms y p95 de lecturas de 2060 ms. El diagnóstico muestra que una lectura pasa de 10 ms a 2403 ms durante 10 logins simultáneos |
-| Estado | Falla (2 de 4 umbrales); nuevo hallazgo 31 |
+| Estado | Falla (2 de 4 umbrales); nuevo hallazgo 31 (DEF-A06) |
 | Evidencia | `reports/k6/perf-01.txt`, `reports/k6/perf-01.json`, `reports/k6/perf-01-diagnostico.txt` |
 | Responsable | Persona A |
 
@@ -429,6 +429,6 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Pasos, o nombre de la prueba automatizada | `tests/auth-seguridad/performance/recommendation_load.js`, con `run_k6.sh recommendation_load.js perf-02-delay-0` y `perf-02-delay-3000` |
 | Resultado esperado | p95 de la solicitud menor a 1000 ms; p95 de solicitud a resultado de 50 s o menos; 100% en `COMPLETED` |
 | Resultado obtenido | Sin latencia: 837 ms, 5.6 s y 100%, cumple los tres. Con 3 s por llamada: 704 ms y 100%, pero p95 de solicitud a resultado de 94 s (una sola tarda 11 s; las demás esperan en cola) |
-| Estado | Pasa sin latencia; falla con latencia (1 de 3 umbrales); nuevo hallazgo 32 |
+| Estado | Pasa sin latencia; falla con latencia (1 de 3 umbrales); nuevo hallazgo 32 (DEF-A07) |
 | Evidencia | `reports/k6/perf-02-delay-0.txt` y `.json`, `reports/k6/perf-02-delay-3000.txt` y `.json` |
 | Responsable | Persona A |
