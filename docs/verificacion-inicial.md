@@ -99,6 +99,14 @@ Encontrado el 2026-11-27 al escribir las pruebas unitarias de `app/core/security
 
 33. **El backend acepta un secreto JWT público y con él cualquiera fabrica tokens válidos.** `app/config.py` define `jwt_secret` con el valor por defecto `"change-me-in-production"`, y `.env.example` publica otro valor fijo. Nada impide arrancar en producción con cualquiera de los dos. Además, `resolve_user_from_token` intenta primero validar el token como JWT local en cualquier modo, también con Supabase configurado. Con un backend levantado con el secreto de `.env.example`, un token fabricado para el id 1, sin contraseña ni login, dio acceso al perfil y a las zonas de esa persona. Evidencia: `reports/manual/def-jwt-secreto-publico.txt`.
 
+## Hallazgos del escaneo con OWASP ZAP
+
+Encontrados el 2026-11-27 con `zap-baseline.py` (escaneo pasivo) contra el ambiente QA local y al revisar la imagen de producción del frontend. Reportes en `reports/zap/`.
+
+34. **La imagen de producción del frontend no llega a la API.** Las 15 llamadas del frontend usan rutas relativas (`/api/v1/...`) que solo funcionan gracias al proxy del servidor de desarrollo de Vite. La etapa `prod` de `src/frontend/Dockerfile` sirve la aplicación con nginx y una configuración que responde `return 502` a todo `/api/`. Con la imagen construida, la interfaz carga (200), pero el login, el registro y cualquier otra llamada responden 502: la aplicación no funciona desplegada así. Evidencia: `reports/manual/def-frontend-prod-sin-api.txt`.
+35. **Ni el frontend ni la API envían cabeceras de seguridad.** Faltan `Content-Security-Policy`, `X-Frame-Options` (o `frame-ancestors`), `X-Content-Type-Options`, `Permissions-Policy` y las cabeceras `Cross-Origin-*`. Ocurre en el servidor de desarrollo, en el nginx de producción (que solo envía `Server: nginx/1.27.5`) y en las respuestas JSON de FastAPI, que no tiene ningún middleware de cabeceras. ZAP las marca como riesgo medio (CSP y clickjacking) y bajo (el resto).
+36. **La documentación de la API está expuesta en cualquier ambiente y carga scripts de un CDN sin SRI.** `app/main.py` publica `/docs`, `/redoc` y `/openapi.json` sin condición de ambiente, así que también quedarían abiertos en producción. Swagger UI carga JavaScript y CSS de `cdn.jsdelivr.net` sin atributo `integrity`: si el CDN entrega un archivo alterado, se ejecuta en el origen de la API.
+
 ## Hallazgos formalizados como defectos
 
 Los hallazgos se formalizan en `docs/defectos.md`, con severidad, prioridad, pasos para reproducir y evidencia. Hallazgos de la Persona A:
@@ -109,6 +117,9 @@ Los hallazgos se formalizan en `docs/defectos.md`, con severidad, prioridad, pas
 | 14 | DEF-A02 | Alta |
 | 30 | DEF-A03 | Alta |
 | 33 | DEF-A13 | Alta |
+| 34 | DEF-A14 | Alta |
+| 35 | DEF-A15 | Media |
+| 36 | DEF-A16 | Baja |
 | 26 | DEF-A04 | Alta |
 | 25 | DEF-A05 | Alta |
 | 31 | DEF-A06 | Alta |

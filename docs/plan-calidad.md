@@ -141,7 +141,7 @@ Probabilidad e impacto en escala Alta, Media o Baja. La prioridad combina ambos:
 | R-04 | Los datos personales quedan expuestos en errores o a otras personas | Producto | Media | Alto | Alta | SEC-03 y SEC-05. Se materializó: DEF-A02, DEF-A10 |
 | R-05 | El sistema se vuelve inutilizable cuando varias personas lo usan a la vez | Producto | Media | Medio | Media | PERF-01 y PERF-02 con umbrales previos. Se materializó: DEF-A06, DEF-A07 |
 | R-06 | Un cambio futuro rompe funcionalidad sin que la suite lo detecte | Producto | Alta | Medio | Alta | Cobertura, Ruff, SonarQube e inspección; regresión automatizada del equipo QA |
-| R-07 | El sistema no se puede instalar ni reproducir desde cero | Producto | Alta | Medio | Alta | Construcción del ambiente QA desde cero. Se materializó: DEF-A04, DEF-A05 y los hallazgos 5 y 6 |
+| R-07 | El sistema no se puede instalar ni reproducir desde cero | Producto | Alta | Medio | Alta | Construcción del ambiente QA desde cero. Se materializó: DEF-A04, DEF-A05, DEF-A14 y los hallazgos 5 y 6 |
 | R-08 | Las pruebas generan costo o dependen de la disponibilidad de terceros | Proyecto | Alta | Medio | Alta | LLM falso y autenticación local; las llaves reales nunca se usan en pruebas automatizadas |
 | R-09 | Se usan o publican datos personales reales | Proyecto | Media | Alto | Alta | Solo datos sintéticos; la base de Supabase con 7 usuarios reales no se usa en pruebas ni se copia a la evidencia; se revisa la evidencia antes de publicarla |
 | R-10 | Las respuestas del LLM real no son deterministas y los resultados no se pueden repetir | Proyecto | Alta | Medio | Alta | Las pruebas automatizadas usan el LLM falso; las corridas con el LLM real son exploratorias y se reportan como tales |

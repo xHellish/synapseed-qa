@@ -27,14 +27,17 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | DEF-A02 | Los errores 500 exponen el traceback y rutas internas | Alta | Alta | Abierto | CP-RNF01-05 (SEC-05) | Ben Farz |
 | DEF-A03 | El login no limita los intentos fallidos | Alta | Alta | Abierto | CP-RNF01-06 (SEC-06) | Ben Farz |
 | DEF-A13 | Con el secreto JWT por defecto o el de `.env.example`, cualquiera fabrica tokens válidos | Alta | Alta | Abierto | CP-RNF01-07 | Ben Farz |
+| DEF-A14 | La imagen de producción del frontend responde 502 a todas las llamadas a la API | Alta | Alta | Abierto | CP-RNF01-08 (SEC-08) | Ben Farz |
 | DEF-A04 | Una instalación desde cero falla por enums incompatibles | Alta | Media | Abierto | Construcción del ambiente QA | Ben Farz |
 | DEF-A05 | El seed no carga productos porque sus CSV no están en el repo | Alta | Media | Abierto | Construcción del ambiente QA | Ben Farz |
 | DEF-A06 | El bcrypt del login bloquea todo el backend | Alta | Media | Abierto | CP-RNF04-01 (PERF-01) | Ben Farz |
 | DEF-A07 | Con varias personas, las recomendaciones superan los 50 s documentados | Alta | Media | Abierto | CP-RNF04-02 (PERF-02) | Ben Farz |
 | DEF-A08 | Zonas no valida la entrada: acepta campos extra y responde 500 a tipos incorrectos | Media | Media | Abierto | CP-RNF01-04 (SEC-04) | Ben Farz |
+| DEF-A15 | Ni el frontend ni la API envían cabeceras de seguridad | Media | Media | Abierto | CP-RNF01-08 (SEC-08) | Ben Farz |
 | DEF-A09 | El health check responde "ok" con Redis caído | Media | Media | Abierto | Prueba de humo de la API y verificación con Redis detenido | Ben Farz |
 | DEF-A10 | El stream de progreso de una recomendación no exige token | Media | Baja | Abierto | CP-RNF01-03 (SEC-03) | Ben Farz |
 | DEF-A11 | Un token inválido responde 503 con detalles de configuración | Baja | Baja | Abierto | CP-RNF01-02 (SEC-02) | Ben Farz |
+| DEF-A16 | La documentación de la API queda expuesta en producción y carga scripts de un CDN sin SRI | Baja | Baja | Abierto | CP-RNF01-08 (SEC-08) | Ben Farz |
 | DEF-A12 | El registro está definido en dos esquemas con reglas distintas | Baja | Baja | Abierto | CP-RF01-07 | Ben Farz |
 
 ## Defectos de Ben Farz (Persona A)
@@ -259,3 +262,54 @@ Todos los defectos se observaron en el commit `ec14b12` de SynapSeed. Los del am
 | Estado | Abierto |
 | Responsable | Ben Farz |
 | Caso de prueba que lo encontró | CP-RNF01-07. Hallazgo 33 |
+
+### DEF-A14
+
+| Campo | Valor |
+|-------|-------|
+| Título | La imagen de producción del frontend responde 502 a todas las llamadas a la API |
+| Descripción | El frontend llama a la API con 15 rutas relativas (`/api/v1/...`). En desarrollo funcionan porque el servidor de Vite las reenvía al backend (`vite.config.ts`, `proxy`). La etapa `prod` de `src/frontend/Dockerfile` sirve la aplicación con nginx y una configuración que contiene `location /api/ { return 502; }`, sin reenvío al backend. Desplegada con esa imagen, la interfaz carga pero ninguna función responde: ni registro, ni login, ni recomendaciones |
+| Característica 25010 | Adecuación funcional (completitud funcional); Fiabilidad (disponibilidad) |
+| Severidad | Alta |
+| Prioridad | Alta |
+| Pasos para reproducir | 1. Con el ambiente QA arriba, construir `docker build --target prod -t synapseed-qa-frontend-prod synapseed/src/frontend`. 2. Correr `docker run -d --rm -p 127.0.0.1:8080:80 synapseed-qa-frontend-prod`. 3. Pedir `GET /`, `GET /api/v1/health` y `POST /api/v1/auth/login` a `http://127.0.0.1:8080` |
+| Resultado esperado | La imagen de producción reenvía `/api/` al backend, o el frontend usa una URL de API configurable, y el login responde 200 o 401 según las credenciales |
+| Resultado actual | `GET /` responde 200, pero `GET /api/v1/health` y `POST /api/v1/auth/login` responden 502 |
+| Evidencia | `reports/manual/def-frontend-prod-sin-api.txt` |
+| Estado | Abierto |
+| Responsable | Ben Farz |
+| Caso de prueba que lo encontró | CP-RNF01-08 (SEC-08), al revisar si las alertas de ZAP del frontend aplicaban a producción. Hallazgo 34 |
+
+### DEF-A15
+
+| Campo | Valor |
+|-------|-------|
+| Título | Ni el frontend ni la API envían cabeceras de seguridad |
+| Descripción | Ninguna respuesta incluye `Content-Security-Policy`, `X-Frame-Options` o `frame-ancestors`, `X-Content-Type-Options`, `Permissions-Policy` ni las cabeceras `Cross-Origin-*`. Ocurre en el servidor de desarrollo, en el nginx de producción (solo envía `Server: nginx/1.27.5`) y en las respuestas de FastAPI, que no tiene middleware de cabeceras. Sin ellas, la aplicación se puede incrustar en un sitio ajeno para engañar a la persona (clickjacking) y una inyección de script no tiene una segunda barrera |
+| Característica 25010 | Seguridad (integridad, confidencialidad) |
+| Severidad | Media |
+| Prioridad | Media |
+| Pasos para reproducir | 1. Correr `bash tests/auth-seguridad/security/run_zap.sh http://127.0.0.1:5173 zap-frontend` y `... http://127.0.0.1:8000/docs zap-api`. 2. Revisar las alertas 10038, 10020, 10021, 10063 y 90004. 3. Confirmar en producción con `curl -D - http://127.0.0.1:8080/` sobre la imagen de DEF-A14, y en la API con `GET /api/v1/catalogs/crops` |
+| Resultado esperado | Las respuestas incluyen al menos CSP, protección contra clickjacking y `X-Content-Type-Options: nosniff` (RNF-01, criterio 5) |
+| Resultado actual | ZAP reporta las 5 cabeceras ausentes en la interfaz y en la API (riesgo medio para CSP y clickjacking); nginx de producción y FastAPI no envían ninguna |
+| Evidencia | `reports/zap/zap-frontend.html` y `.json`, `reports/zap/zap-api.html` y `.json`; `reports/manual/def-frontend-prod-sin-api.txt` (cabeceras de producción) |
+| Estado | Abierto |
+| Responsable | Ben Farz |
+| Caso de prueba que lo encontró | CP-RNF01-08 (SEC-08). Hallazgo 35 |
+
+### DEF-A16
+
+| Campo | Valor |
+|-------|-------|
+| Título | La documentación de la API queda expuesta en producción y carga scripts de un CDN sin SRI |
+| Descripción | `app/main.py` crea la aplicación con `docs_url="/docs"`, `redoc_url="/redoc"` y `openapi_url="/openapi.json"` sin depender del ambiente, así que la documentación interactiva y el esquema completo de la API quedan públicos también en producción. Swagger UI carga JavaScript y CSS de `cdn.jsdelivr.net` sin atributo `integrity`, de modo que un archivo alterado en el CDN se ejecutaría en el origen de la API |
+| Característica 25010 | Seguridad (confidencialidad, integridad) |
+| Severidad | Baja |
+| Prioridad | Baja |
+| Pasos para reproducir | 1. Correr `bash tests/auth-seguridad/security/run_zap.sh http://127.0.0.1:8000/docs zap-api`. 2. Revisar las alertas 90003 y 10017. 3. Leer `create_app` en `app/main.py` |
+| Resultado esperado | La documentación se desactiva fuera de desarrollo, o sus recursos se sirven localmente o con SRI |
+| Resultado actual | `/docs` responde 200 sin condición de ambiente y sus scripts externos no tienen `integrity` |
+| Evidencia | `reports/zap/zap-api.html` y `.json` |
+| Estado | Abierto |
+| Responsable | Ben Farz |
+| Caso de prueba que lo encontró | CP-RNF01-08 (SEC-08). Hallazgo 36 |

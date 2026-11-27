@@ -27,6 +27,7 @@ Los resultados esperados salen de los criterios de aceptación de `docs/requisit
 | CP-RNF01-05 (SEC-05) | Detalles internos en errores | RNF-01 (7) | Adivinación de errores: provocar un 500 | Seguridad | Falla (DEF-A02, hallazgo 14) |
 | CP-RNF01-06 (SEC-06) | Fuerza bruta en el login | RNF-01 (8) | Prueba de ataque: 30 intentos seguidos | Seguridad | Falla (DEF-A03, hallazgo 30) |
 | CP-RNF01-07 | Secreto JWT público | RNF-01 (1, 6) | Prueba de ataque: token fabricado con un secreto conocido | Unitaria y seguridad | Falla (DEF-A13, hallazgo 33) |
+| CP-RNF01-08 (SEC-08) | Escaneo pasivo con OWASP ZAP | RNF-01 (5, 7) | Análisis automatizado de configuración | Seguridad | Falla (DEF-A14, A15, A16; hallazgos 34 a 36) |
 | CP-RNF04-01 (PERF-01) | Carga de autenticación y lectura | RNF-04 (3) | Prueba de carga con umbrales previos | Rendimiento | Falla (DEF-A06, hallazgo 31) |
 | CP-RNF04-02 (PERF-02) | Recomendaciones simultáneas | RNF-04 (1, 2), RNF-03 (1) | Prueba de carga con umbrales previos | Rendimiento | Pasa sin latencia; falla con latencia (DEF-A07, hallazgo 32) |
 
@@ -412,6 +413,26 @@ Las pruebas que confirman un defecto conocido se marcan con `@pytest.mark.xfail(
 | Resultado obtenido | La configuración acepta ambos secretos en producción. El token fabricado con el secreto de `.env.example` da 200 en `/users/me` y `/zones` del usuario 900000001 sin login |
 | Estado | Falla; nuevo hallazgo 33 (DEF-A13) |
 | Evidencia | `reports/manual/def-jwt-secreto-publico.txt`; `reports/pytest/auth-seguridad.txt` y `.xml` |
+| Responsable | Ben Farz |
+
+## CP-RNF01-08
+
+| Campo | Valor |
+|-------|-------|
+| ID | CP-RNF01-08 |
+| Nombre | Escaneo pasivo con OWASP ZAP (SEC-08) |
+| Objetivo | Detectar problemas de configuración de seguridad visibles en las respuestas de la interfaz y de la API |
+| Requerimiento asociado | RNF-01, criterios 5 y 7 |
+| Tipo y nivel de prueba | Seguridad, sistema (escaneo pasivo automatizado) |
+| Prioridad | Media |
+| Característica 25010 que evidencia | Seguridad (confidencialidad, integridad) |
+| Precondiciones | Ambiente QA local arriba; imagen `ghcr.io/zaproxy/zaproxy:stable` disponible |
+| Datos de prueba | Interfaz `http://127.0.0.1:5173` y documentación de la API `http://127.0.0.1:8000/docs`; sin sesión |
+| Pasos, o nombre de la prueba automatizada | `bash tests/auth-seguridad/security/run_zap.sh http://127.0.0.1:5173 zap-frontend` y `... http://127.0.0.1:8000/docs zap-api`; revisión de la imagen de producción del frontend en `127.0.0.1:8080` |
+| Resultado esperado | Ninguna alerta de riesgo alto ni medio; cabeceras de seguridad presentes en la interfaz y en la API |
+| Resultado obtenido | 0 alertas de riesgo alto. Riesgo medio: falta CSP y protección contra clickjacking en ambas, y `/docs` carga scripts sin SRI. La imagen de producción tampoco envía cabeceras y responde 502 a todas las llamadas a la API |
+| Estado | Falla; nuevos hallazgos 34, 35 y 36 (DEF-A14, DEF-A15, DEF-A16) |
+| Evidencia | `reports/zap/zap-frontend.*`, `reports/zap/zap-api.*`, `reports/manual/def-frontend-prod-sin-api.txt`; análisis en `tests/auth-seguridad/security/verificaciones.md` |
 | Responsable | Ben Farz |
 
 ## CP-RNF04-01

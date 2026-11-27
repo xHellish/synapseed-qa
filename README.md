@@ -123,6 +123,13 @@ Auditoría de calidad de SynapSeed para el curso IC-6831 Aseguramiento de la Cal
    bash tests/auth-seguridad/performance/run_k6.sh recommendation_load.js perf-02-rampa-delay-0
    ```
 
+   El escaneo pasivo de OWASP ZAP se corre igual, desde WSL; el script solo acepta URLs del ambiente QA local y deja los reportes en `reports/zap/`:
+
+   ```bash
+   bash tests/auth-seguridad/security/run_zap.sh http://127.0.0.1:5173 zap-frontend
+   bash tests/auth-seguridad/security/run_zap.sh http://127.0.0.1:8000/docs zap-api
+   ```
+
 ## Organización del trabajo
 
 Las pruebas están separadas por área funcional; cada área tiene un dueño, que solo hace commit dentro de su carpeta. En la columna Responsable de casos, defectos y matriz va el nombre de cada integrante, que es la base de la nota individual.

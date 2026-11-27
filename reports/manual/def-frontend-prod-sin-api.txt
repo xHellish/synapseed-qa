@@ -1,0 +1,19 @@
+Hallazgo 34 - La imagen de produccion del frontend no llega a la API
+Fecha: 2026-11-27. Imagen construida con: docker build --target prod -t synapseed-qa-frontend-prod synapseed/src/frontend
+Contenedor en 127.0.0.1:8080 (nginx de src/frontend/Dockerfile, etapa prod), con el ambiente QA arriba.
+
+GET / -> 200
+GET /login -> 200
+GET /api/v1/health -> 502
+GET /api/v1/auth/login -> 502
+POST /api/v1/auth/login -> 502
+
+Cabeceras de seguridad en GET / (produccion):
+Server: nginx/1.27.5
+(fin de cabeceras: solo aparecen las listadas arriba)
+
+Llamadas del frontend a la API (rutas relativas, src/features):
+15 llamadas con ruta relativa /api/v1/...
+Configuracion de nginx en src/frontend/Dockerfile:
+46:    location / { try_files $uri $uri/ /index.html; } \
+47:    location /api/ { return 502; } \

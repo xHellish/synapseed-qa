@@ -13,11 +13,12 @@ Ejecución: 2026-11-26, con `synapseed\src\backend\.venv\Scripts\python -m pytes
 | SEC-05 | Los errores no exponen detalles internos | Configuración de seguridad (OWASP A05) | `test_cp_rnf01_05_error_500_sin_traceback` | **Falla.** Un 500 devuelve el traceback completo de Python con rutas del servidor (hallazgo 14). La causa es `debug: bool = True` por defecto en `app/config.py` |
 | SEC-06 | El login limita los intentos fallidos | Autenticación (OWASP A07) | `test_cp_rnf01_06_login_limita_intentos_fallidos` | **Falla.** 30 contraseñas incorrectas seguidas contra la misma cédula responden 401, sin 429 ni bloqueo, a unos 4 intentos por segundo; después la contraseña correcta sigue funcionando (hallazgo 30) |
 
-Verificación adicional, fuera de las 6 mínimas:
+Verificaciones adicionales, fuera de las 6 mínimas:
 
 | ID | Verificación | Tipo | Prueba o herramienta | Resultado |
 |----|--------------|------|----------------------|-----------|
 | SEC-07 | Nadie fabrica tokens válidos con un secreto JWT conocido | Autenticación y configuración (OWASP A02, A05, A07) | `unit/test_security_helpers.py` (`test_cp_rnf01_07_*`) y `security/forge_token_check.py` | **Falla.** El backend arranca en producción con el secreto por defecto o el de `.env.example`, y con ese secreto un token fabricado sin login dio acceso al perfil y a las zonas del usuario 900000001 (hallazgo 33, DEF-A13). Evidencia: `reports/manual/def-jwt-secreto-publico.txt` |
+| SEC-08 | Escaneo pasivo de cabeceras y configuración con OWASP ZAP | Configuración de seguridad (OWASP A05) | `security/run_zap.sh` (ZAP 2.17.0, `zap-baseline.py`) | **Falla en parte.** 0 alertas de riesgo alto y 16 advertencias. Faltan las cabeceras de seguridad en el frontend y en la API (hallazgo 35, DEF-A15), y `/docs` carga scripts de un CDN sin SRI en cualquier ambiente (hallazgo 36, DEF-A16). Al revisar si las alertas del frontend eran propias del modo desarrollo, se encontró que la imagen de producción no llega a la API (hallazgo 34, DEF-A14). Evidencia: `reports/zap/` y `reports/manual/def-frontend-prod-sin-api.txt` |
 
 ## Detalle de los ataques
 
@@ -57,6 +58,25 @@ Con la configuración por defecto, FastAPI se crea con `debug=True`, y cualquier
 
 Ningún middleware ni dependencia limita peticiones (no hay `slowapi` ni equivalente). El criterio se deriva de OWASP ASVS 4.0, requisito 2.2.1, porque la Spec no lo menciona (ver RNF-01, criterio 8).
 
-## Pendiente
+### SEC-08 Escaneo pasivo con OWASP ZAP
 
-- OWASP ZAP baseline contra `http://127.0.0.1:8000` y `http://127.0.0.1:5173`, con el reporte en `reports/zap/`.
+`zap-baseline.py` (ZAP 2.17.0, imagen `ghcr.io/zaproxy/zaproxy:stable`) recorre el sitio con el spider durante 1 minuto y analiza las respuestas de forma pasiva: no envía ataques. Se corrió el 2026-11-27 contra la interfaz (`http://127.0.0.1:5173`) y la documentación de la API (`http://127.0.0.1:8000/docs`) del ambiente QA local. Resultado: 0 fallos, 7 advertencias en la interfaz y 9 en la API, con 61 y 59 reglas pasivas aprobadas.
+
+La interfaz del ambiente QA corre con el servidor de desarrollo de Vite. Para saber si las alertas eran propias del modo desarrollo, se construyó la imagen de producción del frontend (`Dockerfile`, etapa `prod`, nginx) y se revisaron sus respuestas: tampoco envía ninguna cabecera de seguridad, así que las alertas aplican a producción.
+
+| Alerta de ZAP | Riesgo (confianza) | Dónde | Clasificación |
+|---------------|--------------------|-------|---------------|
+| Content Security Policy no definida (10038) | Medio (alta) | Interfaz y `/docs` | Defecto, DEF-A15. Sin CSP, una inyección de script no tiene una segunda barrera |
+| Falta cabecera contra clickjacking (10020) | Medio (media) | Interfaz y `/docs` | Defecto, DEF-A15. La aplicación se puede incrustar en un `iframe` ajeno |
+| Falta `X-Content-Type-Options` (10021) | Bajo (media) | Interfaz, `/` y `/docs` de la API | Defecto, DEF-A15. También falta en las respuestas JSON (`GET /api/v1/catalogs/crops` solo envía `Content-Type` y `Server`) |
+| Falta `Permissions-Policy` (10063) | Bajo (media) | Interfaz y `/docs` | Defecto, DEF-A15 |
+| Faltan `Cross-Origin-Embedder/Opener/Resource-Policy` (90004) | Bajo (media) | Interfaz y API | Defecto, DEF-A15, de menor peso: endurecen el aislamiento entre orígenes |
+| Atributo SRI ausente (90003) | Medio (alta) | `/docs` | Defecto, DEF-A16: Swagger UI carga scripts de `cdn.jsdelivr.net` sin verificación de integridad |
+| Inclusión de JavaScript de otro dominio (10017) | Bajo (media) | `/docs` | Defecto, DEF-A16 (misma causa) |
+| Aplicación web moderna (10109) | Informativo | Interfaz y `/docs` | No es defecto: avisa que el spider tradicional cubre poco de una SPA |
+| Contenido almacenable en caché (10049) | Informativo | Interfaz y API | No es defecto: las respuestas públicas pueden guardarse en caché; las autenticadas no se alcanzaron en el escaneo pasivo |
+
+Las rutas `/@vite/client` y `/src/main.tsx` que aparecen en el reporte de la interfaz solo existen en modo desarrollo; las alertas de cabeceras se repiten igual en `/` de la imagen de producción.
+
+**Limitación.** El spider sin sesión no recorre las pantallas protegidas ni los endpoints autenticados, y el escaneo pasivo no prueba inyecciones. Eso se cubre con las verificaciones dirigidas SEC-01 a SEC-07.
+
